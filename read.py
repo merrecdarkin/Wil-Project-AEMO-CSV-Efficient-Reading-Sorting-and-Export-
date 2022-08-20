@@ -7,7 +7,14 @@ from dateutil.parser import parse
 import os.path
 import PySimpleGUI as sg
 
+def loadCSV(nameOfCSV,DUIDsets):
+    with open(nameOfCSV,'r') as csv_file:
+        csv_reader = csv.reader(csv_file)
 
+        for line in csv_reader:
+            for targetDUID in DUIDsets:
+                if line[5]==targetDUID :
+                    print(line)
 
 
 
@@ -25,17 +32,25 @@ file_list_column = [
     ],
 ]
 
-image_viewer_column = [
-    [sg.Text("Choose an image from the list on the left:")],
+input_column = [
+    [sg.Text("User input pannel Placeholder")],
     [sg.Text(size=(40,1), key="-TOUT-")],
-    [sg.Image(key="-IMAGE")],
+    [sg.Text("Target DUID")],
+    [sg.InputText(key="-INPUT DUID-")],
+
+    [sg.Text("From date d/mm/yyyy")],
+    [sg.InputText(key="-INPUT DATE START-")],
+    [sg.Text("To date")],
+    [sg.InputText(key="-INPUT DATE END-")],
+    [sg.Button('Confirm', button_color=('white', 'firebrick3'), key='-CONFIRM-')]
+
 ]
 
 layout = [
     [
         sg.Column(file_list_column),
         sg.VSeperator(),
-        sg.Column(image_viewer_column),
+        sg.Column(input_column),
 
     ]
 ]
@@ -50,17 +65,27 @@ while True:
         folder= values["-FOLDER-"]
         try:
             file_list= os.listdir(folder)
-            print(folder)
-            for f in file_list:
-                if os.path.isfile(os.path.join(folder, f))  and f.lower().endswith((".csv")):
-                    print(f)
+            
+
         except:
             file_list=[]
         fnames = [
             f
             for f in file_list
             if os.path.isfile(os.path.join(folder, f))
-            and f.lower().endswith((".csv"))
+            and f.lower().endswith((".csv")) and ("PUBLIC_BIDMOVE_COMPLETE" in f)
         ]
         window["-FILE LIST-"].update(fnames)
+
+    if event== "-CONFIRM-":
+        folder= values["-FOLDER-"]
+        print(folder)
+        for f in file_list:
+                if os.path.isfile(os.path.join(folder, f))  and f.lower().endswith((".csv")) and ("PUBLIC_BIDMOVE_COMPLETE" in f):
+                    print(f)
+                    if values["-INPUT DUID-"] != "":
+                        DUIDsets= values["-INPUT DUID-"].split()
+                        loadCSV(f,DUIDsets)
+
+
 window.close()
