@@ -1,20 +1,38 @@
-import matplotlib.pyplot as plt;
-from matplotlib.figure import Figure
-import numpy as np;
-import sqlite3, csv, os, datetime, zipfile
-from pathlib import Path
-from dateutil.parser import parse
+import csv
+import datetime
+import os
 import os.path
+import sqlite3
+import zipfile
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import PySimpleGUI as sg
+from dateutil.parser import parse
+from matplotlib.figure import Figure
+
 
 def loadCSV(nameOfCSV,DUIDsets):
+
     with open(nameOfCSV,'r') as csv_file:
         csv_reader = csv.reader(csv_file)
-
+        
         for line in csv_reader:
             for targetDUID in DUIDsets:
-                if line[5]==targetDUID :
-                    print(line)
+                if (line[0])=="D":
+                    if line[5]==targetDUID :
+                        print(line)
+
+    df = pd.read_csv(nameOfCSV, skiprows=1, skipfooter=1, on_bad_lines='skip')
+
+    for targetDUID in DUIDsets:
+        print(df.loc[df['DUID'] == targetDUID])     
+    df2 = pd.read_csv(nameOfCSV, skiprows=len(df. index)+2, skipfooter=1, on_bad_lines='skip')
+    for targetDUID in DUIDsets:
+        print(df2.loc[df2['DUID'] == targetDUID])     
+
 
 
 
@@ -35,7 +53,7 @@ file_list_column = [
 input_column = [
     [sg.Text("User input pannel Placeholder")],
     [sg.Text(size=(40,1), key="-TOUT-")],
-    [sg.Text("Target DUID")],
+    [sg.Text("Target DUID (seperate via space)")],
     [sg.InputText(key="-INPUT DUID-")],
 
     [sg.Text("From date d/mm/yyyy")],
