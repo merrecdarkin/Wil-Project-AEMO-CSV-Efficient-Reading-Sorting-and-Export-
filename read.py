@@ -14,22 +14,14 @@ from dateutil.parser import parse
 from matplotlib.figure import Figure
 
 
-def loadCSV(nameOfCSV,DUIDsets):
-
-    with open(nameOfCSV,'r') as csv_file:
-        csv_reader = csv.reader(csv_file)
-        
-        for line in csv_reader:
-            for targetDUID in DUIDsets:
-                if (line[0])=="D":
-                    if line[5]==targetDUID :
-                        print(line)
-
-    df = pd.read_csv(nameOfCSV, skiprows=1, skipfooter=1, on_bad_lines='skip')
+def loadCSV(nameOfCSV,DUIDsets,folPath):
+    print(folPath)
+    PathAndNameFile=folPath+"/"+nameOfCSV
+    df = pd.read_csv(PathAndNameFile, skiprows=1, skipfooter=1, on_bad_lines='skip')
 
     for targetDUID in DUIDsets:
         print(df.loc[df['DUID'] == targetDUID])     
-    df2 = pd.read_csv(nameOfCSV, skiprows=len(df. index)+2, skipfooter=1, on_bad_lines='skip')
+    df2 = pd.read_csv(PathAndNameFile, skiprows=len(df. index)+2, skipfooter=1, on_bad_lines='skip')
     for targetDUID in DUIDsets:
         print(df2.loc[df2['DUID'] == targetDUID])     
 
@@ -103,7 +95,7 @@ while True:
                     print(f)
                     if values["-INPUT DUID-"] != "":
                         DUIDsets= values["-INPUT DUID-"].split()
-                        loadCSV(f,DUIDsets)
+                        loadCSV(f,DUIDsets,folder)
 
 
 window.close()
