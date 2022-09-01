@@ -73,27 +73,20 @@ while True: # Event loop - read window events and inputs
         break
 
     if event== "-FOLDER-": # Folder browser callback event
-        folder= values["-FOLDER-"]
-        try:
-            file_list= os.listdir(folder)
-        except:
-            file_list=[]
-        fnames = [
-            f
-            for f in file_list
-            if os.path.isfile(os.path.join(folder, f))
-            and f.lower().endswith((".csv")) and ("PUBLIC_BIDMOVE_COMPLETE" in f)
-        ]
-        window["-FILE LIST-"].update(fnames)
+        selectedFolderPath= values["-FOLDER-"]
+        fileInSelectedFolder = os.listdir(selectedFolderPath)
+        validCSVFile = [f for f in fileInSelectedFolder if app.isValidCSVFile(f,selectedFolderPath)]
+        window["-FILE LIST-"].update(validCSVFile)
 
     if event== "-CONFIRM-": # Export button callback event
-        folder= values["-FOLDER-"]
-        print(folder)
-        for f in file_list:
-                if os.path.isfile(os.path.join(folder, f))  and f.lower().endswith((".csv")) and ("PUBLIC_BIDMOVE_COMPLETE" in f):
-                    print(f)
-                    if values["-INPUT DUID-"] != "": 
-                        DUIDsets= values["-INPUT DUID-"].split() #This will fetch Value from inputs, require further expansion
-                        app.loadCSV(f,DUIDsets,folder)
+        selectedFolderPath= values["-FOLDER-"]
+        fileInSelectedFolder = os.listdir(selectedFolderPath)
+        validCSVFile = [f for f in fileInSelectedFolder if app.isValidCSVFile(f,selectedFolderPath)]
+        validCSVFilePath = [os.path.join(selectedFolderPath, f) for f in validCSVFile]
+
+        for f in validCSVFilePath:
+            if values["-INPUT DUID-"]: 
+                DUIDsets= values["-INPUT DUID-"].split() #This will fetch Value from inputs, require further expansion
+                app.loadCSV(f,DUIDsets)
 
 window.close()
