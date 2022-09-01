@@ -4,13 +4,19 @@ import PySimpleGUI as sg
 
 import App as app
 
-file_list_column = [  #Most GUI layout will be done in this section
-    [
-        sg.Text("csv Folder"),
-        sg.In(size=(25,1), enable_events=True, key="-FOLDER-"),
+fileBrowserColumn = [ 
+    
+    # The app GUI is divided into 2 main column
+    # Left column is the file browser column with browser bar and list box for CSV files
+    # Right column is user input field, preview section, and confirmation buttons
+    # This block of code is the LEFT column of the GUI
+    
+    [ # Folder browser bar
+        sg.Text("CSV Folder"),
+        sg.Input(size=(20,1), enable_events=True, key="-FOLDER-"),
         sg.FolderBrowse(),
     ],
-    [
+    [ # Display CSV file names from selected folder
         sg.Listbox(
             values=[], enable_events=True, size=(40,20),
             key="-FILE LIST-"
@@ -18,41 +24,58 @@ file_list_column = [  #Most GUI layout will be done in this section
     ],
 ]
 
-input_column = [ #These are input fiels and their corresponding fetch ID to be use later
-    [sg.Text("User input pannel Placeholder")],
-    [sg.Text(size=(40,1), key="-TOUT-")],
-    [sg.Text("Target DUID (seperate via space)")],
-    [sg.InputText(key="-INPUT DUID-")],
+dataQueryColumnInput = [
+    
+    # This block of code is a subcolumn in the main RIGHT column of the GUI
+    # Based on the GUI design, user input and confirmation buttons are placed in a single row
+    # as 2 side-by-side column
+    
+    # Text field to be input by the users as query params
+    [sg.Text("Enter DUID (separated by space):")],
+    [sg.InputText(key = "-INPUT DUID-")],
+    [sg.Text("Enter BIDTYPE (separated by space):")],
+    [sg.InputText(key = "-INPUT BIDTYPE-")],
+    [sg.Text("From SETTLEMENTDATE (dd/mm/yyyy)")],
+    [sg.InputText(key = "-INPUT DATE START-")],
+    [sg.Text("To SETTLEMENTDATE (dd/mm/yyyy)")],
+    [sg.InputText(key = "-INPUT DATE END-")],
+]
 
-    [sg.Text("From date d/mm/yyyy")],
-    [sg.InputText(key="-INPUT DATE START-")],
-    [sg.Text("To date")],
-    [sg.InputText(key="-INPUT DATE END-")],
-    [sg.Button('Confirm', button_color=('white', 'firebrick3'), key='-CONFIRM-')]
+dataQueryColumnButton = [
+    [sg.Button('Export', key = '-CONFIRM-')],
+    [sg.Button('Preview', key = '-PREVIEW-')]
+]
 
+dataQueryColumn = [
+    
+    # The app GUI is divided into 2 main column
+    # Left column is the file browser column with browser bar and list box for CSV files
+    # Right column is user input field, preview section, and confirmation buttons
+    # This block of code is the RIGHT column of the GUI
+    
+    [sg.Column(dataQueryColumnInput),sg.Column(dataQueryColumnButton)],
+    [sg.Text('Preview Data:')],
+    [sg.Listbox(values = ['preview section placeholder'], size = (60,10))]
 ]
 
 layout = [
-    [
-        sg.Column(file_list_column),
-        sg.VSeperator(),
-        sg.Column(input_column),
-
-    ]
+    [sg.Column(fileBrowserColumn), sg.VSeperator(),sg.Column(dataQueryColumn)]
 ]
 
-window = sg.Window("File Comp",layout)  #This is GUI interaction function section
+window = sg.Window("AEMO Data Manipulation Tool",layout) # Window creation
+# GUI follows "Persistent Window with updates" design pattern with a single main window
 
-while True:
+while True: # Event loop - read window events and inputs
+
     event, values = window.read()
+
     if event == "Exit" or event ==sg.WIN_CLOSED:
         break
-    if event== "-FOLDER-": #This is GUI Folder button (currently perfect and need no change)
+
+    if event== "-FOLDER-": # Folder browser callback event
         folder= values["-FOLDER-"]
         try:
             file_list= os.listdir(folder)
-            
-
         except:
             file_list=[]
         fnames = [
@@ -63,7 +86,7 @@ while True:
         ]
         window["-FILE LIST-"].update(fnames)
 
-    if event== "-CONFIRM-":
+    if event== "-CONFIRM-": # Export button callback event
         folder= values["-FOLDER-"]
         print(folder)
         for f in file_list:
@@ -72,6 +95,5 @@ while True:
                     if values["-INPUT DUID-"] != "": 
                         DUIDsets= values["-INPUT DUID-"].split() #This will fetch Value from inputs, require further expansion
                         app.loadCSV(f,DUIDsets,folder)
-
 
 window.close()
