@@ -1,8 +1,10 @@
 import os
 import os.path
 import PySimpleGUI as sg
-
+import pandas as pd
 import App as app
+from datetime import datetime
+
 
 fileBrowserColumn = [ 
     
@@ -17,10 +19,7 @@ fileBrowserColumn = [
         sg.FolderBrowse(),
     ],
     [ # Display CSV file names from selected folder
-        sg.Listbox(
-            values=[], enable_events=True, size=(40,20),
-            key="-FILE LIST-"
-        )
+        sg.Listbox(values=[], enable_events=True, size=(40,20), key="-FILE LIST-")
     ],
 ]
 
@@ -55,7 +54,7 @@ dataQueryColumn = [
     
     [sg.Column(dataQueryColumnInput),sg.Column(dataQueryColumnButton)],
     [sg.Text('Preview Data:')],
-    [sg.Listbox(values = ['preview section placeholder'], size = (60,10))]
+    [sg.Listbox(values = ['preview section placeholder'], enable_events=True, size = (60,10), key = "-PREVIEW LIST-")]
 ]
 
 layout = [
@@ -83,10 +82,19 @@ while True: # Event loop - read window events and inputs
         fileInSelectedFolder = os.listdir(selectedFolderPath)
         validCSVFile = [f for f in fileInSelectedFolder if app.isValidCSVFile(f,selectedFolderPath)]
         validCSVFilePath = [os.path.join(selectedFolderPath, f) for f in validCSVFile]
+        
+        DUIDset = values['-INPUT DUID-'].split()
+        BIDTYPEset = values['-INPUT BIDTYPE-'].split()
+        DATESTARTset = DATEENDset = ''
+        if values['-INPUT DATE START-']:
+            DATESTARTset = datetime.strptime(values['-INPUT DATE START-'],'%d/%m/%Y')  
+        if values['-INPUT DATE END-']:
+            DATEENDset = datetime.strptime(values['-INPUT DATE END-'],'%d/%m/%Y')
 
+        output = []
         for f in validCSVFilePath:
-            if values["-INPUT DUID-"]: 
-                DUIDsets= values["-INPUT DUID-"].split() #This will fetch Value from inputs, require further expansion
-                app.loadCSV(f,DUIDsets)
+            output.append(app.loadCSV(f,DUIDset,BIDTYPEset,DATESTARTset,DATEENDset))
+        pd.concat(output).to_excel("output.xlsx")
+        os.startfile("output.xlsx")
 
 window.close()
