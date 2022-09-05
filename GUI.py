@@ -2,7 +2,6 @@ import glob
 import os
 import os.path
 import PySimpleGUI as sg
-import pandas as pd
 import App as app
 from datetime import datetime
 
@@ -88,11 +87,11 @@ while True: # Event loop - read window events and inputs
         validCSVFilePath = glob.glob(selectedFolderPath + "/PUBLIC_BIDMOVE_COMPLETE*.csv")
         
         """
-        After getting CSV file paths, the app now fetch the user input data from the input text fields
-        DUIDset and BIDTYPEset are separated by space, .split() method is used to split each of them and add to the query list
-        DUIDset and BIDTYPEset str values are converted into UPPERCASE with .upper()
-        DATESTARTset and DATEENDset need to be init as an empty string, this is to make sure they can be passed to app.loadCSV() if the user left them blank
-        If any of DATE field is specified, convert them from str to datetime type with datetime.strptime()
+        After getting CSV file paths, the app now fetch the user input data from the input text fields:
+        - DUIDset and BIDTYPEset are separated by space, .split() method is used to split each of them and add to the query list
+        - DUIDset and BIDTYPEset str values are converted into UPPERCASE with .upper()
+        - DATESTARTset and DATEENDset need to be init as an empty string, this is to make sure they can be passed to app.loadCSV() if the user left them blank
+        - If any of DATE field is specified, convert them from str to datetime type with datetime.strptime()
         """
         DUIDset = [x.upper() for x in values['-INPUT DUID-'].split()]
         BIDTYPEset = [x.upper() for x in values['-INPUT BIDTYPE-'].split()]
@@ -101,20 +100,14 @@ while True: # Event loop - read window events and inputs
             DATESTARTset = datetime.strptime(values['-INPUT DATE START-'],'%d/%m/%Y')  
         if values['-INPUT DATE END-']:
             DATEENDset = datetime.strptime(values['-INPUT DATE END-'],'%d/%m/%Y')
+        
         """
-        Since there will be multiple CSV file loaded, this is the current workflow to merge all the data to a single output:
-        - Init an empty output list (this is needed because pd.concat() methods read a list of pd.dataframe obj and merge them)
-        - Read each of the CSV file one-by-one (use for loop to loop through the list of CSV file path)
-        - For each CSV file, we cann app.loadCSV() and pass the query data as params to the function
-        - For each loop, we loop through a single CSV file, and the function return a df.dataframe object as the queried result
-        - We add the result dataframe object to the output list
-        - Finally we call pd.concat() to merge all the separated dataframe in the output list to a unified dataframe/output table
-        - to_excel() method is called to write the table into an output excel file, this requires openpyxl library
+        After fetching input data, pass them along with the CSV file paths to loadCSV() function
+        The loadCSV() function returns a queried/processed dataframe based on user input data
+        Use to_excel() to write the output dataframe to a xlsx file
+        Finally autostart the output xlsx file
         """
-        output = []
-        for f in validCSVFilePath:
-            output.append(app.loadCSV(f,DUIDset,BIDTYPEset,DATESTARTset,DATEENDset))
-        pd.concat(output).to_excel("output.xlsx")
-        os.startfile("output.xlsx") # Autorun the output excel after export
+        output = app.loadCSV(validCSVFilePath,DUIDset,BIDTYPEset,DATESTARTset,DATEENDset).to_excel('output.xlsx')
+        os.startfile('output.xlsx')
 
 window.close()
