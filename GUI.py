@@ -2,6 +2,7 @@ import glob
 import os
 import os.path
 import PySimpleGUI as sg
+import pandas as pd
 import App as app
 from datetime import datetime
 
@@ -103,11 +104,16 @@ while True: # Event loop - read window events and inputs
         
         """
         After fetching input data, pass them along with the CSV file paths to loadCSV() function
-        The loadCSV() function returns a queried/processed dataframe based on user input data
+        The loadCSV() function returns a tuple of 2 queried/processed dataframes (price,quantity) based on user input data
         Use to_excel() to write the output dataframe to a xlsx file
-        Finally autostart the output xlsx file
+        Use ExcelWriter to construct the structure of output xlsx:
+        - output[0] returns priceTable dataframe, written to 'Price' sheet
+        - output[1] returns quantityTable dataframe, written to 'Quantity' sheet
         """
-        output = app.loadCSV(validCSVFilePath,DUIDset,BIDTYPEset,DATESTARTset,DATEENDset).to_excel('output.xlsx')
-        os.startfile('output.xlsx')
+        output = app.loadCSV(validCSVFilePath,DUIDset,BIDTYPEset,DATESTARTset,DATEENDset)
+        with pd.ExcelWriter('output.xlsx') as writer:
+            output[0].to_excel(writer, sheet_name='Price')
+            output[1].to_excel(writer, sheet_name='Quantity')
+        os.startfile('output.xlsx') # Autostart, file handling depends on user OS settings, will use MS Excel if installed and set as default xlsx handler
 
 window.close()
