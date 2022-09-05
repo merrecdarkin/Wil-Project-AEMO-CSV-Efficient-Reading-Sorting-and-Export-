@@ -1,3 +1,4 @@
+import glob
 import os
 import os.path
 import PySimpleGUI as sg
@@ -71,52 +72,48 @@ while True: # Event loop - read window events and inputs
         """
         Workflow of the callback event, when the Browse button is click and a folder had been selected, do as follow:
         - Read the folder path
-        - List all the directories within that folder path (this will include both files and sub-folders)
-        - Check for valid CSV file from the directory list (check app.isValidCSVFile for function explanation)
-        - After getting all the valid CSV file name, update it to the side panel in GUI
+        - Retrieve all valid CSV file paths within the folder path using glob() pattern matching
+        - Retrieve only the CSV file names from the CSV file paths
+        - Update valid CSV file names to the side panel in GUI
         """
         selectedFolderPath= values["-FOLDER-"]
-        fileInSelectedFolder = os.listdir(selectedFolderPath)
-        validCSVFile = [f for f in fileInSelectedFolder if app.isValidCSVFile(f,selectedFolderPath)]
-        window["-FILE LIST-"].update(validCSVFile)
+        validCSVFilePath = glob.glob(selectedFolderPath + "/PUBLIC_BIDMOVE_COMPLETE*.csv")
+        validCSVFileName = [os.path.basename(f) for f in validCSVFilePath]
+        window["-FILE LIST-"].update(validCSVFileName)
 
     if event== "-CONFIRM-": # Export button callback event
-        """
-        Workflow of this callback event is initially similar to folder browser event
-        After getting all the valid CSV file name, it will construct a full file path for each of the CSV, so that they can be read later
-        """
+
+        #First, read the folder path and retrive all valid CSV file paths
         selectedFolderPath= values["-FOLDER-"]
-        fileInSelectedFolder = os.listdir(selectedFolderPath)
-        validCSVFile = [f for f in fileInSelectedFolder if app.isValidCSVFile(f,selectedFolderPath)]
-        validCSVFilePath = [os.path.join(selectedFolderPath, f) for f in validCSVFile] # Construct full file path for CSV files
+        validCSVFilePath = glob.glob(selectedFolderPath + "/PUBLIC_BIDMOVE_COMPLETE*.csv")
         
         """
-        After getting CSV file paths, the app now fetch the user input data from the input text fields
-        DUIDset and BIDTYPEset are separated by space so .split() method is used to split each of them and add to the query list
-        DATESTARTset and DATEENDset need to be init as an empty string, this is to make sure they can be passed to app.loadCSV() method if the user left them blank
-        If any of DATE field is specified, convert them from str to datetime type with datetime.strptime()
+        After getting CSV file paths, the app now fetch the user input data from the input text fields:
+        - DUIDset and BIDTYPEset are separated by space, .split() method is used to split each of them and add to the query list
+        - DUIDset and BIDTYPEset str values are converted into UPPERCASE with .upper()
+        - DATESTARTset and DATEENDset need to be init as an empty string, this is to make sure they can be passed to app.loadCSV() if the user left them blank
+        - If any of DATE field is specified, convert them from str to datetime type with datetime.strptime()
         """
-        DUIDset = values['-INPUT DUID-'].split()
-        BIDTYPEset = values['-INPUT BIDTYPE-'].split()
+        DUIDset = [x.upper() for x in values['-INPUT DUID-'].split()]
+        BIDTYPEset = [x.upper() for x in values['-INPUT BIDTYPE-'].split()]
         DATESTARTset = DATEENDset = ''
         if values['-INPUT DATE START-']:
             DATESTARTset = datetime.strptime(values['-INPUT DATE START-'],'%d/%m/%Y')  
         if values['-INPUT DATE END-']:
             DATEENDset = datetime.strptime(values['-INPUT DATE END-'],'%d/%m/%Y')
+        
         """
-        Since there will be multiple CSV file loaded, this is the current workflow to merge all the data to a single output:
-        - Init an empty output list (this is needed because pd.concat() methods read a list of pd.dataframe obj and merge them)
-        - Read each of the CSV file one-by-one (use for loop to loop through the list of CSV file path)
-        - For each CSV file, we cann app.loadCSV() and pass the query data as params to the function
-        - For each loop, we loop through a single CSV file, and the function return a df.dataframe object as the queried result
-        - We add the result dataframe object to the output list
-        - Finally we call pd.concat() to merge all the separated dataframe in the output list to a unified dataframe/output table
-        - to_excel() method is called to write the table into an output excel file, this requires openpyxl library
+        After fetching input data, pass them along with the CSV file paths to loadCSV() function
+        The loadCSV() function returns a tuple of 2 queried/processed dataframes (price,quantity) based on user input data
+        Use to_excel() to write the output dataframe to a xlsx file
+        Use ExcelWriter to construct the structure of output xlsx:
+        - output[0] returns priceTable dataframe, written to 'Price' sheet
+        - output[1] returns quantityTable dataframe, written to 'Quantity' sheet
         """
-        output = []
-        for f in validCSVFilePath:
-            output.append(app.loadCSV(f,DUIDset,BIDTYPEset,DATESTARTset,DATEENDset))
-        pd.concat(output).to_excel("output.xlsx")
-        os.startfile("output.xlsx") # Autorun the output excel after export
+        output = app.loadCSV(validCSVFilePath,DUIDset,BIDTYPEset,DATESTARTset,DATEENDset)
+        with pd.ExcelWriter('output.xlsx') as writer:
+            output[0].to_excel(writer, sheet_name='Price')
+            output[1].to_excel(writer, sheet_name='Quantity')
+        os.startfile('output.xlsx') # Autostart, file handling depends on user OS settings, will use MS Excel if installed and set as default xlsx handler
 
 window.close()
