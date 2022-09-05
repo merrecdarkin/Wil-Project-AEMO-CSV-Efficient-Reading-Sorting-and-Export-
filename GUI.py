@@ -93,11 +93,12 @@ while True: # Event loop - read window events and inputs
         """
         After getting CSV file paths, the app now fetch the user input data from the input text fields
         DUIDset and BIDTYPEset are separated by space so .split() method is used to split each of them and add to the query list
+        DUIDset and BIDTYPEset str values are converted into uppercase with .upper()
         DATESTARTset and DATEENDset need to be init as an empty string, this is to make sure they can be passed to app.loadCSV() method if the user left them blank
         If any of DATE field is specified, convert them from str to datetime type with datetime.strptime()
         """
-        DUIDset = values['-INPUT DUID-'].split()
-        BIDTYPEset = values['-INPUT BIDTYPE-'].split()
+        DUIDset = [x.upper() for x in values['-INPUT DUID-'].split()]
+        BIDTYPEset = [x.upper() for x in values['-INPUT BIDTYPE-'].split()]
         DATESTARTset = DATEENDset = ''
         if values['-INPUT DATE START-']:
             DATESTARTset = datetime.strptime(values['-INPUT DATE START-'],'%d/%m/%Y')  
