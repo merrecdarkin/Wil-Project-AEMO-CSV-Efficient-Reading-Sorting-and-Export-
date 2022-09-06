@@ -80,8 +80,12 @@ while True: # Event loop - read window events and inputs
         validCSVFilePath = glob.glob(selectedFolderPath + "/PUBLIC_BIDMOVE_COMPLETE*.csv")
         validCSVFileName = [os.path.basename(f) for f in validCSVFilePath]
         window["-FILE LIST-"].update(validCSVFileName)
+        print('-------------------------------------')
+        print('CSV dataset updated!')
 
     if event== "-CONFIRM-": # Export button callback event
+        start=datetime.now() # Process runtime calculation (to be removed in final release)
+        print('Loading...')
 
         #First, read the folder path and retrive all valid CSV file paths
         selectedFolderPath= values["-FOLDER-"]
@@ -115,5 +119,8 @@ while True: # Event loop - read window events and inputs
             output[0].to_excel(writer, sheet_name='Price')
             output[1].to_excel(writer, sheet_name='Quantity')
         os.startfile('output.xlsx') # Autostart, file handling depends on user OS settings, will use MS Excel if installed and set as default xlsx handler
+
+        print('Process runtime: ',datetime.now()-start)
+        print('-------------------------------------')
 
 window.close()
