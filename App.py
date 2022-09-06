@@ -14,11 +14,11 @@ def loadCSV(validCSVFilePath,DUIDset,BIDTYPEset,DATESTARTset,DATEENDset):
     quantityTables = []
     for f in validCSVFilePath:
         biddayoffer = pd.read_csv(f, skiprows=1, skipfooter=1, on_bad_lines='skip', parse_dates=['SETTLEMENTDATE'], engine='python')
-        priceTables.append(biddayoffer)
         bidperoffer = pd.read_csv(f, skiprows=len(biddayoffer)+2, skipfooter=1, on_bad_lines='skip', parse_dates=['SETTLEMENTDATE'], engine='python')
+        priceTables.append(biddayoffer)
         quantityTables.append(bidperoffer)
     priceTable = pd.concat(priceTables,ignore_index=True)
-    quantityTable = pd.concat(quantityTables,ignore_index=True)
+    quantityTable = pd.concat(quantityTables,ignore_index=True).drop_duplicates(subset=['DUID','BIDTYPE','LASTCHANGED'])
 
     # Data query construction
     DUIDquery = BIDTYPEquery = DATESTARTquery = DATEENDquery = 'True'
@@ -49,6 +49,6 @@ def loadCSV(validCSVFilePath,DUIDset,BIDTYPEset,DATESTARTset,DATEENDset):
     The output will return rows that match the DUID list, all BIDTYPE is allowed (no filter), SETTLEMENTDATE will range from DATESTART to the rest of the table as no DATEEND cut-off is specified
     This implementation is to avoid errors when user pass an empty field as input
     """
-
-    return (priceTable.query(finalQuery),quantityTable.query(finalQuery))
-    # return a tuple (price,quantity) dataframe after queried/processed
+    priceTable = priceTable.query(finalQuery)
+    quantityTable = quantityTable.query(finalQuery)
+    return (priceTable,quantityTable)
