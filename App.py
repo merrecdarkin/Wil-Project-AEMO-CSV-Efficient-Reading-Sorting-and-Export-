@@ -49,6 +49,6 @@ def loadCSV(validCSVFilePath,DUIDset,BIDTYPEset,DATESTARTset,DATEENDset):
     The output will return rows that match the DUID list, all BIDTYPE is allowed (no filter), SETTLEMENTDATE will range from DATESTART to the rest of the table as no DATEEND cut-off is specified
     This implementation is to avoid errors when user pass an empty field as input
     """
-    priceTable = priceTable.query(finalQuery)
-    quantityTable = quantityTable.query(finalQuery)
+    priceTable = priceTable.query(finalQuery).sort_values(by=['DUID','SETTLEMENTDATE'])
+    quantityTable = quantityTable.query(finalQuery).sort_values(by=['DUID','SETTLEMENTDATE'])
     return (priceTable,quantityTable)
