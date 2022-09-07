@@ -13,8 +13,8 @@ def loadCSV(absoluteCSVFilePath,DUIDset,BIDTYPEset,DATESTARTset,DATEENDset):
         
         # Read price table (BIDDAYOFFER_D)
         priceTable = pd.read_csv(f, skiprows=1, on_bad_lines='skip', parse_dates=['SETTLEMENTDATE'], engine='c')
-        # Read quantity table (BIDPEROFFER_D)
-        quantityTable = pd.read_csv(f, skiprows=len(priceTable)+1, on_bad_lines='skip', parse_dates=['SETTLEMENTDATE'], engine='c')
+        # Read quantity table (BIDPEROFFER_D), drop duplicate data
+        quantityTable = pd.read_csv(f, skiprows=len(priceTable)+1, on_bad_lines='skip', parse_dates=['SETTLEMENTDATE'], engine='c').drop_duplicates(subset=['DUID','BIDTYPE','LASTCHANGED'])
         # Add each dataframe to merger-list accordingly
         priceTables.append(priceTable)
         quantityTables.append(quantityTable)
@@ -24,9 +24,9 @@ def loadCSV(absoluteCSVFilePath,DUIDset,BIDTYPEset,DATESTARTset,DATEENDset):
     print('All CSV loaded! Merging data...')
     start = dt.datetime.now()
 
-    # Merge all CSV data into one dataframe, purge replications in quantity table
+    # Merge all CSV data into one dataframe
     priceTable = pd.concat(priceTables,ignore_index=True)
-    quantityTable = pd.concat(quantityTables,ignore_index=True).drop_duplicates(subset=['DUID','BIDTYPE','LASTCHANGED'])
+    quantityTable = pd.concat(quantityTables,ignore_index=True)
     
     print('Dataframes successfully merged in:', dt.datetime.now()-start)
 
