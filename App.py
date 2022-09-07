@@ -2,7 +2,7 @@ import datetime as dt
 import pandas as pd
 
 
-def loadCSV(absoluteCSVFilePath,DUIDset,BIDTYPEset,DATESTARTset,DATEENDset):
+def loadCSV(absoluteCSVFilePath,DUIDset,BIDTYPEset):
 
     # List for later multi CSV merge
     priceTables = []
@@ -12,9 +12,9 @@ def loadCSV(absoluteCSVFilePath,DUIDset,BIDTYPEset,DATESTARTset,DATEENDset):
         start = dt.datetime.now()
         
         # Read price table (BIDDAYOFFER_D)
-        priceTable = pd.read_csv(f, skiprows=1, on_bad_lines='skip', parse_dates=['SETTLEMENTDATE'], engine='c')
+        priceTable = pd.read_csv(f, skiprows=1, on_bad_lines='skip', engine='c')
         # Read quantity table (BIDPEROFFER_D), drop duplicate data
-        quantityTable = pd.read_csv(f, skiprows=len(priceTable)+1, on_bad_lines='skip', parse_dates=['SETTLEMENTDATE'], engine='c').drop_duplicates(subset=['DUID','BIDTYPE','LASTCHANGED'])
+        quantityTable = pd.read_csv(f, skiprows=len(priceTable)+1, on_bad_lines='skip', engine='c').drop_duplicates(subset=['DUID','BIDTYPE','LASTCHANGED'])
         # Add each dataframe to merger-list accordingly
         priceTables.append(priceTable)
         quantityTables.append(quantityTable)
@@ -35,24 +35,41 @@ def loadCSV(absoluteCSVFilePath,DUIDset,BIDTYPEset,DATESTARTset,DATEENDset):
 
     # If any of the input field is left blank, then a str value of 'True' will be assigned, to be used in df query statement
     # It will create an effect to ignore that empty query field, and return all the data from that column without filtering
-    DUIDquery = BIDTYPEquery = DATESTARTquery = DATEENDquery = 'True'
+    DUIDquery = BIDTYPEquery = 'True'
 
     # If the input filter is not blank, construct the query string for each of the input filter
     if DUIDset:
         DUIDquery = 'DUID in @DUIDset'
     if BIDTYPEset:
         BIDTYPEquery = 'BIDTYPE in @BIDTYPEset'
-    if DATESTARTset:
-        DATESTARTquery = 'SETTLEMENTDATE >= @DATESTARTset'
-    if DATEENDset:
-        DATEENDquery = 'SETTLEMENTDATE <= @DATEENDset'
 
     # Concatenate all filter into one query statement
-    finalQuery = DUIDquery + ' and ' + BIDTYPEquery + ' and ' + DATESTARTquery + ' and ' + DATEENDquery
-
+    finalQuery = DUIDquery + ' and ' + BIDTYPEquery
     # Query the merged dataframes, sort by DUID then date
     priceTable = priceTable.query(finalQuery).sort_values(by=['DUID','SETTLEMENTDATE'])
     quantityTable = quantityTable.query(finalQuery).sort_values(by=['DUID','SETTLEMENTDATE'])
 
-    print('Data query executed in:', dt.datetime.now()-start)
+    print('Data query successfully executed in:', dt.datetime.now()-start)
     return (priceTable,quantityTable)
+
+def filterCSVDate(relativeCSVFilePath,dateStart,dateEnd):
+    
+    # Convert str values from date filter to int for comparison
+    # If empty date arg is passed, set default min/max for start and end date
+    if dateStart:
+        dateStart = int(dateStart)
+    else: dateStart = 00000000
+    if dateEnd:
+        dateEnd = int(dateEnd)
+    else: dateEnd = 99999999
+
+    validCSVFilePath = [] # List for valid CSV path in between date range
+
+    for f in relativeCSVFilePath:
+        # Get the date string part from each CSV file name
+        dateStringInCSV = f[f.find('_COMPLETE_')+10:f.find('_COMPLETE_')+18]
+        # Convert date string to int and compare in date range, add to output list if valid
+        if dateStart <= int(dateStringInCSV) <= dateEnd:
+            validCSVFilePath.append(f)
+    
+    return(validCSVFilePath)
