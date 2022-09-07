@@ -25,8 +25,8 @@ def loadCSV(absoluteCSVFilePath,DUIDset,BIDTYPEset):
     start = dt.datetime.now()
 
     # Merge all CSV data into one dataframe
-    priceTable = pd.concat(priceTables,ignore_index=True)
-    quantityTable = pd.concat(quantityTables,ignore_index=True)
+    priceTable = pd.concat(priceTables)
+    quantityTable = pd.concat(quantityTables)
     
     print('Dataframes successfully merged in:', dt.datetime.now()-start)
 
