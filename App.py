@@ -1,3 +1,4 @@
+import datetime as dt
 import pandas as pd
 
 
@@ -13,14 +14,19 @@ def loadCSV(validCSVFilePath,DUIDset,BIDTYPEset,DATESTARTset,DATEENDset):
     priceTables = []
     quantityTables = []
     for f in validCSVFilePath:
+        st = dt.datetime.now()
         biddayoffer = pd.read_csv(f, skiprows=1, skipfooter=1, on_bad_lines='skip', parse_dates=['SETTLEMENTDATE'], engine='python')
         bidperoffer = pd.read_csv(f, skiprows=len(biddayoffer)+2, skipfooter=1, on_bad_lines='skip', parse_dates=['SETTLEMENTDATE'], engine='python')
         priceTables.append(biddayoffer)
         quantityTables.append(bidperoffer)
+        print('Loaded', f, 'in:', dt.datetime.now()-st)
+    st = dt.datetime.now()
     priceTable = pd.concat(priceTables,ignore_index=True)
     quantityTable = pd.concat(quantityTables,ignore_index=True).drop_duplicates(subset=['DUID','BIDTYPE','LASTCHANGED'])
+    print('All CSV loaded! Dataframes merged in:', dt.datetime.now()-st)
 
     # Data query construction
+    st = dt.datetime.now()
     DUIDquery = BIDTYPEquery = DATESTARTquery = DATEENDquery = 'True'
     # If any of the input field is left blank, then a str value of 'True' will be assigned. This is used in the query logic, an empty filter will return ALL data from that filter
     # If the input field is not blank, construct the query string for each of the input field
@@ -51,4 +57,5 @@ def loadCSV(validCSVFilePath,DUIDset,BIDTYPEset,DATESTARTset,DATEENDset):
     """
     priceTable = priceTable.query(finalQuery).sort_values(by=['DUID','SETTLEMENTDATE'])
     quantityTable = quantityTable.query(finalQuery).sort_values(by=['DUID','SETTLEMENTDATE'])
+    print('Data query executed in:', dt.datetime.now()-st)
     return (priceTable,quantityTable)

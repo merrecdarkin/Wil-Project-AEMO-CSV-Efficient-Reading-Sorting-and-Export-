@@ -1,10 +1,9 @@
-import glob
-import os
-import os.path
+import glob as glob
+import os as os
 import PySimpleGUI as sg
 import pandas as pd
 import App as app
-from datetime import datetime
+import datetime as dt
 
 """
 The app GUI is divided into 2 main column
@@ -84,8 +83,8 @@ while True: # Event loop - read window events and inputs
         print('CSV dataset updated!')
 
     if event== "-CONFIRM-": # Export button callback event
-        start=datetime.now() # Process runtime calculation (to be removed in final release)
-        print('Loading...')
+        st=dt.datetime.now() # Process runtime calculation (to be removed in final release)
+        print('Operation started...')
 
         #First, read the folder path and retrive all valid CSV file paths
         selectedFolderPath= values["-FOLDER-"]
@@ -102,9 +101,9 @@ while True: # Event loop - read window events and inputs
         BIDTYPEset = [x.upper() for x in values['-INPUT BIDTYPE-'].split()]
         DATESTARTset = DATEENDset = ''
         if values['-INPUT DATE START-']:
-            DATESTARTset = datetime.strptime(values['-INPUT DATE START-'],'%d/%m/%Y')  
+            DATESTARTset = dt.datetime.strptime(values['-INPUT DATE START-'],'%d/%m/%Y')  
         if values['-INPUT DATE END-']:
-            DATEENDset = datetime.strptime(values['-INPUT DATE END-'],'%d/%m/%Y')
+            DATEENDset = dt.datetime.strptime(values['-INPUT DATE END-'],'%d/%m/%Y')
         
         """
         After fetching input data, pass them along with the CSV file paths to loadCSV() function
@@ -120,7 +119,7 @@ while True: # Event loop - read window events and inputs
             output[1].to_excel(writer, sheet_name='Quantity')
         os.startfile('output.xlsx') # Autostart, file handling depends on user OS settings, will use MS Excel if installed and set as default xlsx handler
 
-        print('Process runtime: ',datetime.now()-start)
+        print('Operation complete! Total process runtime:', dt.datetime.now()-st)
         print('-------------------------------------')
 
 window.close()
