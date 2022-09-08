@@ -25,8 +25,8 @@ def loadCSV(absoluteCSVFilePath,DUIDset,BIDTYPEset):
     start = dt.datetime.now()
 
     # Merge all CSV data into one dataframe
-    priceTable = pd.concat(priceTables)
-    quantityTable = pd.concat(quantityTables)
+    priceTable = pd.concat(priceTables, ignore_index=True)
+    quantityTable = pd.concat(quantityTables, ignore_index=True)
     
     print('Dataframes successfully merged in:', dt.datetime.now()-start)
 
@@ -45,9 +45,9 @@ def loadCSV(absoluteCSVFilePath,DUIDset,BIDTYPEset):
 
     # Concatenate all filter into one query statement
     finalQuery = DUIDquery + ' and ' + BIDTYPEquery
-    # Query the merged dataframes, sort by DUID then date
-    priceTable = priceTable.query(finalQuery).sort_values(by=['DUID','SETTLEMENTDATE'])
-    quantityTable = quantityTable.query(finalQuery).sort_values(by=['DUID','SETTLEMENTDATE'])
+    # Query the merged dataframes, drop unnecessary columns, sort by DUID then SETTLEMENTDATE
+    priceTable = priceTable.query(finalQuery).drop(columns=['I','BID','BIDDAYOFFER_D','2','VERSIONNO']).sort_values(by=['DUID','SETTLEMENTDATE'])
+    quantityTable = quantityTable.query(finalQuery).drop(columns=['I','BID','BIDPEROFFER_D','2','PERIODID','INTERVAL_DATETIME']).sort_values(by=['DUID','SETTLEMENTDATE'])
 
     print('Data query successfully executed in:', dt.datetime.now()-start)
     return (priceTable,quantityTable)
