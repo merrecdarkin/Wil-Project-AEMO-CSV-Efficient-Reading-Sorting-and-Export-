@@ -2,60 +2,74 @@ import datetime as dt
 import pandas as pd
 
 
-def loadCSV(validCSVFilePath,DUIDset,BIDTYPEset,DATESTARTset,DATEENDset):
-    """
-    Process to read multiple CSV files from validCSVFilePath list and merge into one final dataframe:
-    - Init priceTables and quantityTables empty list to hold single dataframe loaded from individual CSV file
-    - Loop through each CSV file and append each dataframe to its according list:
-        + biddayoffer: price table / parent table
-        + bidperoffer: quantity table / child table
-    - Merge all dataframe in priceTables and quantityTables using pd.concat() to one final dataframe for each type (price & quantity)
-    """
+def loadCSV(absoluteCSVFilePath,DUIDset,BIDTYPEset):
+
+    # List for later multi CSV merge
     priceTables = []
     quantityTables = []
-    for f in validCSVFilePath:
-        st = dt.datetime.now()
-        biddayoffer = pd.read_csv(f, skiprows=1, skipfooter=1, on_bad_lines='skip', parse_dates=['SETTLEMENTDATE'], engine='python')
-        bidperoffer = pd.read_csv(f, skiprows=len(biddayoffer)+2, skipfooter=1, on_bad_lines='skip', parse_dates=['SETTLEMENTDATE'], engine='python')
-        priceTables.append(biddayoffer)
-        quantityTables.append(bidperoffer)
-        print('Loaded', f, 'in:', dt.datetime.now()-st)
-    st = dt.datetime.now()
-    priceTable = pd.concat(priceTables,ignore_index=True)
-    quantityTable = pd.concat(quantityTables,ignore_index=True).drop_duplicates(subset=['DUID','BIDTYPE','LASTCHANGED'])
-    print('All CSV loaded! Dataframes merged in:', dt.datetime.now()-st)
+
+    for f in absoluteCSVFilePath:
+        start = dt.datetime.now()
+        
+        # Read price table (BIDDAYOFFER_D)
+        priceTable = pd.read_csv(f, skiprows=1, on_bad_lines='skip', engine='c')
+        # Read quantity table (BIDPEROFFER_D), drop duplicate data
+        quantityTable = pd.read_csv(f, skiprows=len(priceTable)+1, on_bad_lines='skip', engine='c').drop_duplicates(subset=['DUID','BIDTYPE','LASTCHANGED'])
+        # Add each dataframe to merger-list accordingly
+        priceTables.append(priceTable)
+        quantityTables.append(quantityTable)
+
+        print('Loaded', f, 'in:', dt.datetime.now()-start)
+
+    print('All CSV loaded! Merging data...')
+    start = dt.datetime.now()
+
+    # Merge all CSV data into one dataframe
+    priceTable = pd.concat(priceTables)
+    quantityTable = pd.concat(quantityTables)
+    
+    print('Dataframes successfully merged in:', dt.datetime.now()-start)
 
     # Data query construction
-    st = dt.datetime.now()
-    DUIDquery = BIDTYPEquery = DATESTARTquery = DATEENDquery = 'True'
-    # If any of the input field is left blank, then a str value of 'True' will be assigned. This is used in the query logic, an empty filter will return ALL data from that filter
-    # If the input field is not blank, construct the query string for each of the input field
+    start = dt.datetime.now()
+
+    # If any of the input field is left blank, then a str value of 'True' will be assigned, to be used in df query statement
+    # It will create an effect to ignore that empty query field, and return all the data from that column without filtering
+    DUIDquery = BIDTYPEquery = 'True'
+
+    # If the input filter is not blank, construct the query string for each of the input filter
     if DUIDset:
         DUIDquery = 'DUID in @DUIDset'
-        """
-        Query explanation:
-        DUID is the name of the header column pandas get from pd.read_csv(), in this case we have DUID, BIDTYPE and SETTLEMENTDATE. It is equivalent to calling df['DUID'].
-        pandas.query() can interact with variables that are not part of the dataframe, by adding @ before the name.
-        Essentially this query mean 'return any rows that have the DUID value in the DUIDset list, that was fetched from user input.
-        """
     if BIDTYPEset:
         BIDTYPEquery = 'BIDTYPE in @BIDTYPEset'
-    if DATESTARTset:
-        DATESTARTquery = 'SETTLEMENTDATE >= @DATESTARTset'
-    if DATEENDset:
-        DATEENDquery = 'SETTLEMENTDATE <= @DATEENDset'
 
-    finalQuery = DUIDquery + ' and ' + BIDTYPEquery + ' and ' + DATESTARTquery + ' and ' + DATEENDquery
-    """
-    The final query is constructed by concatenating all 4 query conditions
-    As previously mentioned, if the user left any field empty, the query string of that field will become 'True'
-    It will create an effect to ignore that empty query field. In other words it will return all the data from that column/field without filtering
-    E.g. If the users enter DUID, DATESTART but left BIDTYPE and DATEEND empty, the query will become:
-    df.query('DUID in @DUIDset and True and SETTLEMENTDATE >= @DATESTARTset and True')
-    The output will return rows that match the DUID list, all BIDTYPE is allowed (no filter), SETTLEMENTDATE will range from DATESTART to the rest of the table as no DATEEND cut-off is specified
-    This implementation is to avoid errors when user pass an empty field as input
-    """
+    # Concatenate all filter into one query statement
+    finalQuery = DUIDquery + ' and ' + BIDTYPEquery
+    # Query the merged dataframes, sort by DUID then date
     priceTable = priceTable.query(finalQuery).sort_values(by=['DUID','SETTLEMENTDATE'])
     quantityTable = quantityTable.query(finalQuery).sort_values(by=['DUID','SETTLEMENTDATE'])
-    print('Data query executed in:', dt.datetime.now()-st)
+
+    print('Data query successfully executed in:', dt.datetime.now()-start)
     return (priceTable,quantityTable)
+
+def filterCSVDate(relativeCSVFilePath,dateStart,dateEnd):
+    
+    # Convert str values from date filter to int for comparison
+    # If empty date arg is passed, set default min/max for start and end date
+    if dateStart:
+        dateStart = int(dateStart)
+    else: dateStart = 00000000
+    if dateEnd:
+        dateEnd = int(dateEnd)
+    else: dateEnd = 99999999
+
+    validCSVFilePath = [] # List for valid CSV path in between date range
+
+    for f in relativeCSVFilePath:
+        # Get the date string part from each CSV file name
+        dateStringInCSV = f[f.find('_COMPLETE_')+10:f.find('_COMPLETE_')+18]
+        # Convert date string to int and compare in date range, add to output list if valid
+        if dateStart <= int(dateStringInCSV) <= dateEnd:
+            validCSVFilePath.append(f)
+    
+    return(validCSVFilePath)
