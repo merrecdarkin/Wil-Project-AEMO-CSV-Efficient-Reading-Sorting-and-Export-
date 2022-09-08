@@ -117,8 +117,8 @@ while True: # GUI event loop
         # Build Excel export structure
         # Price and Quantity written to dedicated sheet  
         with pd.ExcelWriter('output.xlsx') as writer:
-            output[0].to_excel(writer, sheet_name='Price')
-            output[1].to_excel(writer, sheet_name='Quantity')
+            output[0].to_excel(writer, sheet_name='Price', index=False)
+            output[1].to_excel(writer, sheet_name='Quantity', index=False)
         
         # Autostart after export, default file type (.xlsx) handler is set by the operating system
         os.startfile('output.xlsx') 
