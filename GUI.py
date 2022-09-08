@@ -34,18 +34,18 @@ layout = [
                         [   # Text field input by user as data filter
                             [sg.Text('START DATE (yyyy/mm/dd) e.g. 2022/01/01 (inclusive)')],
                             [sg.InputText(key = '-INPUT DATE START-')],
-                            [sg.Text('END DATE    (yyyy/mm/dd) e.g. 2022/01/31 (inclusive)')],
+                            [sg.Text('END DATE (yyyy/mm/dd) e.g. 2022/01/31 (inclusive)')],
                             [sg.InputText(key = '-INPUT DATE END-')],
-                            [sg.Text('DUID        (separated by space) e.g. BLUFF1 YWPS4')],
+                            [sg.Text('DUID(s) (separated by space) e.g. BLUFF1 YWPS4 ')],
                             [sg.InputText(key = '-INPUT DUID-')],
-                            [sg.Text('BIDTYPE  (separated by space) e.g. ENERGY')],
+                            [sg.Text('BIDTYPE(s) (separated by space) e.g. ENERGY ')],
                             [sg.InputText(key = '-INPUT BIDTYPE-')]
                         ]
                     ),
                     sg.Column(
                         [   # Confirmation buttons
-                            [sg.Button('SET  DATE', key = '-SET DATE-')],
-                            [sg.Button('  EXPORT  ', key = '-EXPORT-')]
+                            [sg.Button(' SET DATE ', key = '-SET DATE-')],
+                            [sg.Button('   EXPORT  ', key = '-EXPORT-')]
                             
                         ]
                     )
@@ -58,7 +58,7 @@ layout = [
     ]
 ]
 
-window = sg.Window('AEMO Data Manipulation Tool', layout)
+window = sg.Window('AEMO Data Extraction Tool', layout)
 
 while True: # GUI event loop
 
