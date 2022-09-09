@@ -33,9 +33,9 @@ layout = [
                     sg.Column( 
                         [   # Text field input by user as data filter
                             [sg.Text('START DATE (yyyy/mm/dd) e.g. 2022/01/01 (inclusive)')],
-                            [sg.InputText(key = '-INPUT DATE START-')],
+                            [sg.InputText(key='-INPUT DATE START-'), sg.CalendarButton('⮟', no_titlebar=False, title='Set Start Date', target='-INPUT DATE START-', format='%Y/%m/%d', button_color=('black','white'))],
                             [sg.Text('END DATE (yyyy/mm/dd) e.g. 2022/01/31 (inclusive)')],
-                            [sg.InputText(key = '-INPUT DATE END-')],
+                            [sg.InputText(key='-INPUT DATE END-'), sg.CalendarButton('⮟', no_titlebar=False, title='Set End Date', target='-INPUT DATE END-', format='%Y/%m/%d', button_color=('black','white'))],
                             [sg.Text('DUID(s) (separated by space) e.g. BLUFF1 YWPS4 ')],
                             [sg.InputText(key = '-INPUT DUID-')],
                             [sg.Text('BIDTYPE(s) (separated by space) e.g. ENERGY ')],
