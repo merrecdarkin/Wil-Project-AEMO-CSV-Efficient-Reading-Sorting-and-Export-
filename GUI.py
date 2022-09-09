@@ -5,6 +5,9 @@ import pandas as pd
 import App as app
 import datetime as dt
 
+### GLOBAL VARIABLES ###
+currentFolderPath = ''
+
 layout = [
     [   # LEFT MAIN COLUMN: Folder browser bar, CSV file list
         sg.Column( 
@@ -45,8 +48,7 @@ layout = [
                     sg.Column(
                         [   # Confirmation buttons
                             [sg.Button(' SET DATE ', key = '-SET DATE-')],
-                            [sg.Button('   EXPORT  ', key = '-EXPORT-')]
-                            
+                            [sg.Button('   EXPORT  ', key = '-EXPORT-')]                            
                         ]
                     )
                 ], 
@@ -69,61 +71,82 @@ while True: # GUI event loop
 
     ### FOLDER BROWSER CALLBACK EVENT ###
     if event== "-FOLDER-":
+        
         # Read the folder path
         currentFolderPath= values["-FOLDER-"]
+        
         # Get all valid CSV file paths relatively to the current dir (recursive match in all sub-dir)
         relativeCSVFilePath = glob.glob('**/PUBLIC_BIDMOVE_COMPLETE*.csv', root_dir=currentFolderPath, recursive=True)
+        
         # Slice CSV file names from full file paths
         CSVFileName = [os.path.basename(f) for f in relativeCSVFilePath]
+        
         # Update CSV file names to file list panel
         window["-FILE LIST-"].update(CSVFileName)
+        
         # Update total file count under file list panel
         window['-FILE TOTAL-'].update(str(len(CSVFileName)))
-
+        
         print('-------------------------------------')
         print('Root folder updated!')
 
+    ### SET DATE CALLBACK EVENT ###
     if event== "-SET DATE-":
-        # Reset/refetch CSV file path (if root directory or date range changed by user)
-        relativeCSVFilePath = glob.glob('**/PUBLIC_BIDMOVE_COMPLETE*.csv', root_dir=currentFolderPath, recursive=True)
-        # Get date range values
-        dateStart = values['-INPUT DATE START-'].replace('/', '')
-        dateEnd = values['-INPUT DATE END-'].replace('/', '')
-        # Filter valid CSV path in date range
-        relativeCSVFilePath = app.filterCSVDate(relativeCSVFilePath, dateStart, dateEnd)
-        # Update CSV file names and total file count
-        CSVFileName = [os.path.basename(f) for f in relativeCSVFilePath]
-        window["-FILE LIST-"].update(CSVFileName)
-        window['-FILE TOTAL-'].update(str(len(CSVFileName)))
-
-        print('CSV file list updated!')
+        
+        # If no root dir selected, stall and print err message, else proceed
+        if (not currentFolderPath):
+            print('Root folder not found. Click BROWSE to try again!')
+        else: #proceed with cb event
+            
+            # Reset/refetch CSV file path (if root directory or date range changed by user)
+            relativeCSVFilePath = glob.glob('**/PUBLIC_BIDMOVE_COMPLETE*.csv', root_dir=currentFolderPath, recursive=True)
+            
+            # Get date range values
+            dateStart = values['-INPUT DATE START-'].replace('/', '')
+            dateEnd = values['-INPUT DATE END-'].replace('/', '')
+            
+            # Filter valid CSV path in date range
+            relativeCSVFilePath = app.filterCSVDate(relativeCSVFilePath, dateStart, dateEnd)
+            
+            # Update CSV file names and total file count
+            CSVFileName = [os.path.basename(f) for f in relativeCSVFilePath]
+            window["-FILE LIST-"].update(CSVFileName)
+            window['-FILE TOTAL-'].update(str(len(CSVFileName)))
+            
+            print('CSV file list updated!')
 
     ### EXPORT BUTTON CALLBACK EVENT ###
     if event== "-EXPORT-":
-        start=dt.datetime.now()
-        print('Operation started...')
-
-        # Get absolute CSV file path by concatenating the root folder path with the relative csv file path
-        absoluteCSVFilePath = [currentFolderPath + '/' + f for f in relativeCSVFilePath]
-
-        # Get DUID and BIDTYPE filter input from user, split by space and convert to UPPERCASE to match source data format
-        DUIDset = [x.upper() for x in values['-INPUT DUID-'].split()]
-        BIDTYPEset = [x.upper() for x in values['-INPUT BIDTYPE-'].split()]
-
-        # Read CSV and query based on user filters
-        # App.loadCSV() returns a tuple of (price,quantity) dataframes
-        output = app.loadCSV(absoluteCSVFilePath, DUIDset, BIDTYPEset)
         
-        # Build Excel export structure
-        # Price and Quantity written to dedicated sheet  
-        with pd.ExcelWriter('output.xlsx') as writer:
-            output[0].to_excel(writer, sheet_name='Price', index=False)
-            output[1].to_excel(writer, sheet_name='Quantity', index=False)
-        
-        # Autostart after export, default file type (.xlsx) handler is set by the operating system
-        os.startfile('output.xlsx') 
-        
-        print('Operation complete! Total process runtime:', dt.datetime.now()-start)
-        print('-------------------------------------')
+        # If no root dir selected, stall and print err message
+        if (not currentFolderPath):
+            print('Root folder not found. Click BROWSE to try again!')
+        else: # proceed with cb event
+            
+            start=dt.datetime.now()
+            print('Operation started...')
+
+            # Get absolute CSV file path by concatenating the root folder path with the relative csv file path
+            absoluteCSVFilePath = [currentFolderPath + '/' + f for f in relativeCSVFilePath]
+            
+            # Get DUID and BIDTYPE filter input from user, split by space and convert to UPPERCASE to match source data format
+            DUIDset = [x.upper() for x in values['-INPUT DUID-'].split()]
+            BIDTYPEset = [x.upper() for x in values['-INPUT BIDTYPE-'].split()]
+            
+            # Read CSV and query based on user filters
+            # App.loadCSV() returns a tuple of (price,quantity) dataframes
+            output = app.loadCSV(absoluteCSVFilePath, DUIDset, BIDTYPEset)
+            
+            # Build Excel export structure
+            # Price and Quantity written to dedicated sheet  
+            with pd.ExcelWriter('output.xlsx') as writer:
+                output[0].to_excel(writer, sheet_name='Price', index=False)
+                output[1].to_excel(writer, sheet_name='Quantity', index=False)
+            
+            # Autostart after export, default file type (.xlsx) handler is set by the operating system
+            os.startfile('output.xlsx') 
+            
+            print('Operation complete! Total process runtime:', dt.datetime.now()-start)
+            print('-------------------------------------')
 
 window.close()
