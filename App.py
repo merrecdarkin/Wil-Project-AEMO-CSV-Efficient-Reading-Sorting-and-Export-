@@ -21,7 +21,8 @@ def loadCSV(absoluteCSVFilePath,DUIDset,BIDTYPEset):
 
         print('Loaded', f, 'in:', dt.datetime.now()-start)
 
-    print('All CSV loaded! Merging data...')
+    print('All CSV loaded!')
+    print('Merging data...')
     start = dt.datetime.now()
 
     # Merge all CSV data into one dataframe
@@ -31,6 +32,7 @@ def loadCSV(absoluteCSVFilePath,DUIDset,BIDTYPEset):
     print('Dataframes successfully merged in:', dt.datetime.now()-start)
 
     # Data query construction
+    print('Querying database...')
     start = dt.datetime.now()
 
     # If any of the input field is left blank, then a str value of 'True' will be assigned, to be used in df query statement
@@ -46,10 +48,16 @@ def loadCSV(absoluteCSVFilePath,DUIDset,BIDTYPEset):
     # Concatenate all filter into one query statement
     finalQuery = DUIDquery + ' and ' + BIDTYPEquery
     # Query the merged dataframes, drop unnecessary columns, sort by DUID then SETTLEMENTDATE
-    priceTable = priceTable.query(finalQuery).drop(columns=['I','BID','BIDDAYOFFER_D','2','VERSIONNO']).sort_values(by=['DUID','SETTLEMENTDATE'])
-    quantityTable = quantityTable.query(finalQuery).drop(columns=['I','BID','BIDPEROFFER_D','2','PERIODID','INTERVAL_DATETIME']).sort_values(by=['DUID','SETTLEMENTDATE'])
+    # If filter parameters left as empty input, only drop and sort, no query
+    if len(DUIDset) == 0 and len(BIDTYPEset) == 0:
+        priceTable = priceTable.drop(columns=['I','BID','BIDDAYOFFER_D','2','VERSIONNO']).sort_values(by=['DUID','SETTLEMENTDATE'])
+        quantityTable = quantityTable.drop(columns=['I','BID','BIDPEROFFER_D','2','PERIODID','INTERVAL_DATETIME']).sort_values(by=['DUID','SETTLEMENTDATE'])
+    else:
+        priceTable = priceTable.query(finalQuery).drop(columns=['I','BID','BIDDAYOFFER_D','2','VERSIONNO']).sort_values(by=['DUID','SETTLEMENTDATE'])
+        quantityTable = quantityTable.query(finalQuery).drop(columns=['I','BID','BIDPEROFFER_D','2','PERIODID','INTERVAL_DATETIME']).sort_values(by=['DUID','SETTLEMENTDATE'])
 
     print('Data query successfully executed in:', dt.datetime.now()-start)
+
     return (priceTable,quantityTable)
 
 def filterCSVDate(relativeCSVFilePath,dateStart,dateEnd):
