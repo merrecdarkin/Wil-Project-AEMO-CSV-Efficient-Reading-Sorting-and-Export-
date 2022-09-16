@@ -7,6 +7,7 @@ import datetime as dt
 
 ### GLOBAL VARIABLES ###
 currentFolderPath = ''
+relativeCSVFilePath = []
 
 layout = [
     [   # LEFT MAIN COLUMN: Folder browser bar, CSV file list
@@ -93,11 +94,16 @@ while True: # GUI event loop
     ### SET DATE CALLBACK EVENT ###
     if event== "-SET DATE-":
         
-        # If no root dir selected, stall and print err message, else proceed
-        if (not currentFolderPath):
+        # Flag to check for any present errors
+        errSetDate = False
+
+        # If no root dir selected, stall and print err message
+        if not currentFolderPath and not errSetDate:
+            errSetDate = True
             sg.Popup('Root folder not found. Please click BROWSE to try again!', title='Error!')
-        else: #proceed with cb event
-            
+
+        # Execute callback when no errors found
+        if not errSetDate:    
             # Reset/refetch CSV file path (if root directory or date range changed by user)
             relativeCSVFilePath = glob.glob('**/PUBLIC_BIDMOVE_COMPLETE*.csv', root_dir=currentFolderPath, recursive=True)
             
@@ -124,11 +130,20 @@ while True: # GUI event loop
     ### EXPORT BUTTON CALLBACK EVENT ###
     if event== "-EXPORT-":
         
+        # Flag to check for any present errors
+        errExport = False
+
         # If no root dir selected, stall and print err message
-        if (not currentFolderPath):
+        if not currentFolderPath and not errExport:
+            errExport = True
             sg.Popup('Root folder not found. Please click BROWSE to try again!', title='Error!')
-        else: # proceed with cb event
-            
+        # If empty CSV file list found, stall and print err message
+        if not relativeCSVFilePath and not errExport:
+            errExport = True
+            sg.Popup('No CSV file detected. Please change Date range or select different root Folder to try again!', title='Error')
+
+        # Execute callback when no errors found
+        if not errExport:    
             start=dt.datetime.now()
             print('Operation started...')
 
