@@ -95,34 +95,38 @@ while True: # GUI event loop
         
         # If no root dir selected, stall and print err message, else proceed
         if (not currentFolderPath):
-            print('Root folder not found. Click BROWSE to try again!')
-            sg.Popup('Root folder not found. Click BROWSE to try again!', title='Error!')
+            sg.Popup('Root folder not found. Please click BROWSE to try again!', title='Error!')
         else: #proceed with cb event
             
             # Reset/refetch CSV file path (if root directory or date range changed by user)
             relativeCSVFilePath = glob.glob('**/PUBLIC_BIDMOVE_COMPLETE*.csv', root_dir=currentFolderPath, recursive=True)
             
-            # Get date range values
-            dateStart = values['-INPUT DATE START-'].replace('/', '')
-            dateEnd = values['-INPUT DATE END-'].replace('/', '')
-            
-            # Filter valid CSV path in date range
-            relativeCSVFilePath = app.filterCSVDate(relativeCSVFilePath, dateStart, dateEnd)
-            
-            # Update CSV file names and total file count
-            CSVFileName = [os.path.basename(f) for f in relativeCSVFilePath]
-            window["-FILE LIST-"].update(CSVFileName)
-            window['-FILE TOTAL-'].update(str(len(CSVFileName)))
-            
-            print('CSV file list updated!')
+            # Check for invalid date format
+            if app.invalidDateFormat(values['-INPUT DATE START-']) or app.invalidDateFormat(values['-INPUT DATE END-']):
+                sg.Popup('Wrong date format detected. Please try "YYYY/MM/DD" again!', title='Error!')
+
+            else: #proceed with cb event
+
+                # Get Date range values
+                dateStart = values['-INPUT DATE START-'].replace('/', '')
+                dateEnd = values['-INPUT DATE END-'].replace('/', '')
+
+                # Filter valid CSV path in date range
+                relativeCSVFilePath = app.filterCSVDate(relativeCSVFilePath, dateStart, dateEnd)
+                
+                # Update CSV file names and total file count
+                CSVFileName = [os.path.basename(f) for f in relativeCSVFilePath]
+                window["-FILE LIST-"].update(CSVFileName)
+                window['-FILE TOTAL-'].update(str(len(CSVFileName)))
+                
+                print('CSV file list updated!')
 
     ### EXPORT BUTTON CALLBACK EVENT ###
     if event== "-EXPORT-":
         
         # If no root dir selected, stall and print err message
         if (not currentFolderPath):
-            print('Root folder not found. Click BROWSE to try again!')
-            sg.Popup('Root folder not found. Click BROWSE to try again!', title='Error!')
+            sg.Popup('Root folder not found. Please click BROWSE to try again!', title='Error!')
         else: # proceed with cb event
             
             start=dt.datetime.now()
