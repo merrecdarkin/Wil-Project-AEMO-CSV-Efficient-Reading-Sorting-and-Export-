@@ -93,7 +93,7 @@ while True: # GUI event loop
 
     ### SET DATE CALLBACK EVENT ###
     if event== "-SET DATE-":
-
+        
         # Flag to check for any present errors
         errSetDate = False
 
