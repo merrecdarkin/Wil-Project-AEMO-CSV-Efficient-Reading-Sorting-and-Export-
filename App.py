@@ -60,6 +60,7 @@ def loadCSV(absoluteCSVFilePath,DUIDset,BIDTYPEset):
 
     return (priceTable,quantityTable)
 
+#################################################################
 def filterCSVDate(relativeCSVFilePath,dateStart,dateEnd):
     
     # Convert str values from date filter to int for comparison
@@ -81,3 +82,19 @@ def filterCSVDate(relativeCSVFilePath,dateStart,dateEnd):
             validCSVFilePath.append(f)
     
     return(validCSVFilePath)
+
+#################################################################
+def invalidDateFormat(dateString):
+
+    # If empty date string is passed, return as valid format (False)
+    if not dateString:
+        return False
+    # If non-empty date string is passed, check for format
+    else:
+        try:
+            # If strptime can convert the string, return as valid format (False)
+            dt.datetime.strptime(dateString, '%Y/%m/%d')
+            return False
+        except:
+            # If exception raised, return as invalid format (True)
+            return True
