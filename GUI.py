@@ -96,6 +96,7 @@ while True: # GUI event loop
         # If no root dir selected, stall and print err message, else proceed
         if (not currentFolderPath):
             print('Root folder not found. Click BROWSE to try again!')
+            sg.Popup('Root folder not found. Click BROWSE to try again!', title='Error!')
         else: #proceed with cb event
             
             # Reset/refetch CSV file path (if root directory or date range changed by user)
@@ -121,6 +122,7 @@ while True: # GUI event loop
         # If no root dir selected, stall and print err message
         if (not currentFolderPath):
             print('Root folder not found. Click BROWSE to try again!')
+            sg.Popup('Root folder not found. Click BROWSE to try again!', title='Error!')
         else: # proceed with cb event
             
             start=dt.datetime.now()
