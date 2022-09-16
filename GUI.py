@@ -138,15 +138,19 @@ while True: # GUI event loop
             output = app.loadCSV(absoluteCSVFilePath, DUIDset, BIDTYPEset)
             
             # Build Excel export structure
-            # Price and Quantity written to dedicated sheet  
+            # Price and Quantity written to dedicated sheet
+            print('Writing data to Excel...')
+            start1 = dt.datetime.now()
             with pd.ExcelWriter('output.xlsx') as writer:
                 output[0].to_excel(writer, sheet_name='Price', index=False)
                 output[1].to_excel(writer, sheet_name='Quantity', index=False)
             
             # Autostart after export, default file type (.xlsx) handler is set by the operating system
+            print('Data successfully exported in:', dt.datetime.now()-start1)
             os.startfile('output.xlsx') 
             
-            print('Operation complete! Total process runtime:', dt.datetime.now()-start)
+            print('Operation complete!')
+            print('Total process runtime:', dt.datetime.now()-start)
             print('-------------------------------------')
 
 window.close()
