@@ -46,10 +46,16 @@ def loadCSV(absoluteCSVFilePath,DUIDset,BIDTYPEset):
     # Concatenate all filter into one query statement
     finalQuery = DUIDquery + ' and ' + BIDTYPEquery
     # Query the merged dataframes, drop unnecessary columns, sort by DUID then SETTLEMENTDATE
-    priceTable = priceTable.query(finalQuery).drop(columns=['I','BID','BIDDAYOFFER_D','2','VERSIONNO']).sort_values(by=['DUID','SETTLEMENTDATE'])
-    quantityTable = quantityTable.query(finalQuery).drop(columns=['I','BID','BIDPEROFFER_D','2','PERIODID','INTERVAL_DATETIME']).sort_values(by=['DUID','SETTLEMENTDATE'])
+    if len(DUIDset) == 0 and len(BIDTYPEset) == 0:
+        priceTable = priceTable.drop(columns=['I','BID','BIDDAYOFFER_D','2','VERSIONNO']).sort_values(by=['DUID','SETTLEMENTDATE'])
+        quantityTable = quantityTable.drop(columns=['I','BID','BIDPEROFFER_D','2','PERIODID','INTERVAL_DATETIME']).sort_values(by=['DUID','SETTLEMENTDATE'])
+    else:
+        priceTable = priceTable.query(finalQuery).drop(columns=['I','BID','BIDDAYOFFER_D','2','VERSIONNO']).sort_values(by=['DUID','SETTLEMENTDATE'])
+        quantityTable = quantityTable.query(finalQuery).drop(columns=['I','BID','BIDPEROFFER_D','2','PERIODID','INTERVAL_DATETIME']).sort_values(by=['DUID','SETTLEMENTDATE'])
 
     print('Data query successfully executed in:', dt.datetime.now()-start)
+    print(priceTable)
+    print(quantityTable)
     return (priceTable,quantityTable)
 
 def filterCSVDate(relativeCSVFilePath,dateStart,dateEnd):
