@@ -140,7 +140,7 @@ while True: # GUI event loop
         # If empty CSV file list found, stall and print err message
         if not relativeCSVFilePath and not errExport:
             errExport = True
-            sg.Popup('No CSV file detected. Please change Date range or select different root Folder to try again!', title='Error')
+            sg.Popup('No CSV file detected. Please change Date range or select different root Folder to try again!', title='Error!')
 
         # Execute callback when no errors found
         if not errExport:    
@@ -157,21 +157,25 @@ while True: # GUI event loop
             # Read CSV and query based on user filters
             # App.loadCSV() returns a tuple of (price,quantity) dataframes
             output = app.loadCSV(absoluteCSVFilePath, DUIDset, BIDTYPEset)
-            
-            # Build Excel export structure
-            # Price and Quantity written to dedicated sheet
-            print('Writing data to Excel...')
-            start1 = dt.datetime.now()
-            with pd.ExcelWriter('output.xlsx') as writer:
-                output[0].to_excel(writer, sheet_name='Price', index=False)
-                output[1].to_excel(writer, sheet_name='Quantity', index=False)
-            
-            # Autostart after export, default file type (.xlsx) handler is set by the operating system
-            print('Data successfully exported in:', dt.datetime.now()-start1)
-            os.startfile('output.xlsx') 
-            
-            print('Operation complete!')
-            print('Total process runtime:', dt.datetime.now()-start)
-            print('-------------------------------------')
+
+            # If empty output detected show popup
+            if len(output[0]) == 0 and len(output[1]) == 0:
+                print('Operation cancelled!')
+                print('-------------------------------------')
+                sg.Popup('Output table appeared to be empty. Please check DUID and BIDTYPE input and try again!', title='Error!')
+            else:            
+                # Build Excel export structure
+                # Price and Quantity written to dedicated sheet
+                print('Writing data to Excel...')
+                start1 = dt.datetime.now()
+                with pd.ExcelWriter('output.xlsx') as writer:
+                    output[0].to_excel(writer, sheet_name='Price', index=False)
+                    output[1].to_excel(writer, sheet_name='Quantity', index=False)
+                # Autostart after export, default file type (.xlsx) handler is set by the operating system
+                print('Data successfully exported in:', dt.datetime.now()-start1)
+                os.startfile('output.xlsx') 
+                print('Operation complete!')
+                print('Total process runtime:', dt.datetime.now()-start)
+                print('-------------------------------------')
 
 window.close()
