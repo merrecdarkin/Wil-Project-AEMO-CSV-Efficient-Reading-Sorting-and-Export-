@@ -24,6 +24,11 @@ layout = [
                 [   # Total file count under file list
                     sg.Text('Total files:'),
                     sg.Text('0', enable_events=True, key='-FILE TOTAL-')
+                ],
+                [   # Folder browser bar for out put
+                    sg.Text('Output Folder'),
+                    sg.Input(size=(20,1), enable_events=True, key='-OUTPUT PATH-'),
+                    sg.FolderBrowse(button_text='BROWSE'),
                 ]
             ]
         ),
