@@ -102,7 +102,7 @@ while True: # GUI event loop
 
     ### OUTPUT FOLDER BROWSER CALLBACK EVENT ###
     if event== "-OUTPUT PATH-":
-        currentOutputPath= values["-OUTPUT PATH-"]
+        currentOutputPath= values["-OUTPUT PATH-"]+'/'
 
     ### SET DATE CALLBACK EVENT ###
     if event== "-SET DATE-":
@@ -181,12 +181,19 @@ while True: # GUI event loop
                 # Price and Quantity written to dedicated sheet
                 print('Writing data to Excel...')
                 start1 = dt.datetime.now()
-                with pd.ExcelWriter('output.xlsx') as writer:
+                # Check and compile full output path and file names
+                outputName = values['-OUTPUT NAME-']+'.xlsx'
+                if not outputName:
+                    outputName = 'output.xlsx'
+                outputPath = currentOutputPath + outputName
+                # Export to Excel format
+                with pd.ExcelWriter(outputPath) as writer:
                     output[0].to_excel(writer, sheet_name='Price', index=False)
                     output[1].to_excel(writer, sheet_name='Quantity', index=False)
-                # Autostart after export, default file type (.xlsx) handler is set by the operating system
                 print('Data successfully exported in:', dt.datetime.now()-start1)
-                os.startfile('output.xlsx') 
+                # Autostart file if checked by user
+                if values['-AUTO OPEN-']:
+                    os.startfile(outputPath) 
                 print('Operation complete!')
                 print('Total process runtime:', dt.datetime.now()-start)
                 print('-------------------------------------')
