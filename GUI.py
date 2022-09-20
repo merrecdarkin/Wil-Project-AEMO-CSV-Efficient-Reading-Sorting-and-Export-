@@ -7,6 +7,7 @@ import datetime as dt
 
 ### GLOBAL VARIABLES ###
 currentFolderPath = ''
+currentOutputPath = ''
 relativeCSVFilePath = []
 
 layout = [
@@ -98,6 +99,10 @@ while True: # GUI event loop
         
         print('-------------------------------------')
         print('Root folder updated!')
+
+    ### OUTPUT FOLDER BROWSER CALLBACK EVENT ###
+    if event== "-OUTPUT PATH-":
+        currentOutputPath= values["-OUTPUT PATH-"]
 
     ### SET DATE CALLBACK EVENT ###
     if event== "-SET DATE-":
