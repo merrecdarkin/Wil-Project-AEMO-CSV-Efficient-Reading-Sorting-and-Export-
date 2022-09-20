@@ -48,7 +48,10 @@ layout = [
                             [sg.Text('DUID(s) (separated by space) e.g. BLUFF1 YWPS4 ')],
                             [sg.InputText(key = '-INPUT DUID-')],
                             [sg.Text('BIDTYPE(s) (separated by space) e.g. ENERGY ')],
-                            [sg.InputText(key = '-INPUT BIDTYPE-')]
+                            [sg.InputText(key = '-INPUT BIDTYPE-')],
+                            [sg.Text('Specify export file name (optional) ')],
+                            [sg.InputText(key = '-OUTPUT NAME-')],
+                            [sg.Checkbox('Autostart Excel file after export?',key="-AUTO OPEN-")]
                         ]
                     ),
                     sg.Column(
