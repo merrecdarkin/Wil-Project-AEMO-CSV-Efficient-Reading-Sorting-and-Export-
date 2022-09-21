@@ -176,6 +176,13 @@ while True: # GUI event loop
             previewData.append('Query processed on '+str(len(absoluteCSVFilePath))+' CSV file(s).')
             previewData.append('Price table contained '+str(len(output[0]))+' row(s).')
             previewData.append('Quantity table contained '+str(len(output[1]))+' row(s)')
+            if len(DUIDset)==0:
+                previewData+=["All DUID will be exported."]
+            else:
+                for i in DUIDset:
+                    previewData+=["",i,"--appeared in Price table for "+str(app.countRowFeature(output[0],i))+" row(s).","--appeared in Quality table for "+str(app.countRowFeature(output[1],i))+" row(s).","--featured BIDTYPE: "]
+                    for j in app.findTypeFeature(output[0],i):
+                        previewData+=["                "+j]
             window["-PREVIEW LIST-"].update(previewData)
 
             # If empty output detected show popup
