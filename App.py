@@ -98,3 +98,17 @@ def invalidDateFormat(dateString):
         except:
             # If exception raised, return as invalid format (True)
             return True
+
+#################################################################
+def countRowFeature(sheet,DUID):
+    return(len(sheet[sheet['DUID'] == DUID])) #count row featured this DUID
+
+#################################################################
+def findTypeFeature(sheet,DUID):
+    typeColection=[]
+    dfSheet= (pd.DataFrame(sheet))
+    queryCommand='DUID =='+'"'+ DUID+'"'
+    dfSheet=dfSheet.query(queryCommand)
+    dfSheet.drop_duplicates(subset=['BIDTYPE'], inplace=True) #set aside bitype in this DUID
+    typeColection=dfSheet['BIDTYPE'].to_numpy()
+    return(typeColection)

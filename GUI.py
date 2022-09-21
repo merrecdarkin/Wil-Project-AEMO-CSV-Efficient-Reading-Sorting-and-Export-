@@ -64,7 +64,7 @@ layout = [
                 ], 
                 # RIGHT MAIN COLUMN LOWER SECTION: Preview console
                 [sg.Text('Preview Data:')],
-                [sg.Listbox(values=['preview section placeholder'], enable_events=True, size=(60,10), key='-PREVIEW LIST-')]
+                [sg.Listbox(values=[], enable_events=True, size=(60,10), key='-PREVIEW LIST-')]
             ]
         )
     ]
@@ -171,32 +171,53 @@ while True: # GUI event loop
             # App.loadCSV() returns a tuple of (price,quantity) dataframes
             output = app.loadCSV(absoluteCSVFilePath, DUIDset, BIDTYPEset)
 
+            # Preview Function
+            previewData = []
+            previewData.append('Query processed on '+str(len(absoluteCSVFilePath))+' CSV file(s).')
+            previewData.append('Price table contained '+str(len(output[0]))+' row(s).')
+            previewData.append('Quantity table contained '+str(len(output[1]))+' row(s)')
+            if len(DUIDset)==0:
+                previewData+=["All DUID will be exported."]
+            else:
+                for i in DUIDset:
+                    previewData+=["",i,"--appeared in Price table for "+str(app.countRowFeature(output[0],i))+" row(s).","--appeared in Quality table for "+str(app.countRowFeature(output[1],i))+" row(s).","--featured BIDTYPE: "]
+                    for j in app.findTypeFeature(output[0],i):
+                        previewData+=["                "+j]
+            window["-PREVIEW LIST-"].update(previewData)
+
             # If empty output detected show popup
             if len(output[0]) == 0 and len(output[1]) == 0:
                 print('Operation cancelled!')
                 print('-------------------------------------')
                 sg.Popup('Output table appeared to be empty. Please check DUID and BIDTYPE input and try again!', title='Error!')
-            else:            
-                # Build Excel export structure
-                # Price and Quantity written to dedicated sheet
-                print('Writing data to Excel...')
-                start1 = dt.datetime.now()
-                # Check and compile full output path and file names
-                outputName = values['-OUTPUT NAME-']
-                if not outputName:
-                    outputName = 'output'
-                outputPath = currentOutputPath + outputName +'.xlsx'
-                # Export to Excel format
-                print(outputPath)
-                with pd.ExcelWriter(outputPath) as writer:
-                    output[0].to_excel(writer, sheet_name='Price', index=False)
-                    output[1].to_excel(writer, sheet_name='Quantity', index=False)
-                print('Data successfully exported in:', dt.datetime.now()-start1)
-                # Autostart file if checked by user
-                if values['-AUTO OPEN-']:
-                    os.startfile(outputPath) 
-                print('Operation complete!')
-                print('Total process runtime:', dt.datetime.now()-start)
-                print('-------------------------------------')
+            else:          
+                # Confirmation popup check
+                CONFRIMATION=sg.popup_yes_no('Please preview output data before proceed. Click Yes to Export and No to Cancel.', title='Confirmation!')
+
+                if CONFRIMATION == 'Yes':
+                    # Build Excel export structure
+                    # Price and Quantity written to dedicated sheet
+                    print('Writing data to Excel...')
+                    start1 = dt.datetime.now()
+                    # Check and compile full output path and file names
+                    outputName = values['-OUTPUT NAME-']
+                    if not outputName:
+                        outputName = 'output'
+                    outputPath = currentOutputPath + outputName +'.xlsx'
+                    # Export to Excel format
+                    print(outputPath)
+                    with pd.ExcelWriter(outputPath) as writer:
+                        output[0].to_excel(writer, sheet_name='Price', index=False)
+                        output[1].to_excel(writer, sheet_name='Quantity', index=False)
+                    print('Data successfully exported in:', dt.datetime.now()-start1)
+                    # Autostart file if checked by user
+                    if values['-AUTO OPEN-']:
+                        os.startfile(outputPath) 
+                    print('Operation complete!')
+                    print('Total process runtime:', dt.datetime.now()-start)
+                    print('-------------------------------------')
+                else:
+                    print('Operation cancelled!')
+                    print('-------------------------------------')
 
 window.close()
