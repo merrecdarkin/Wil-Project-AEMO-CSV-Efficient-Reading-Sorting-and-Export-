@@ -64,7 +64,7 @@ layout = [
                 ], 
                 # RIGHT MAIN COLUMN LOWER SECTION: Preview console
                 [sg.Text('Preview Data:')],
-                [sg.Listbox(values=['preview section placeholder'], enable_events=True, size=(60,10), key='-PREVIEW LIST-')]
+                [sg.Listbox(values=[], enable_events=True, size=(60,10), key='-PREVIEW LIST-')]
             ]
         )
     ]
@@ -170,6 +170,13 @@ while True: # GUI event loop
             # Read CSV and query based on user filters
             # App.loadCSV() returns a tuple of (price,quantity) dataframes
             output = app.loadCSV(absoluteCSVFilePath, DUIDset, BIDTYPEset)
+
+            # Preview Function
+            previewData = []
+            previewData.append('Query processed on '+str(len(absoluteCSVFilePath))+' CSV file(s).')
+            previewData.append('Price table contained '+str(len(output[0]))+' row(s).')
+            previewData.append('Quantity table contained '+str(len(output[1]))+' row(s)')
+            window["-PREVIEW LIST-"].update(previewData)
 
             # If empty output detected show popup
             if len(output[0]) == 0 and len(output[1]) == 0:
