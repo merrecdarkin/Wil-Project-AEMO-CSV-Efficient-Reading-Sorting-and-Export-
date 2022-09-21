@@ -190,27 +190,34 @@ while True: # GUI event loop
                 print('Operation cancelled!')
                 print('-------------------------------------')
                 sg.Popup('Output table appeared to be empty. Please check DUID and BIDTYPE input and try again!', title='Error!')
-            else:            
-                # Build Excel export structure
-                # Price and Quantity written to dedicated sheet
-                print('Writing data to Excel...')
-                start1 = dt.datetime.now()
-                # Check and compile full output path and file names
-                outputName = values['-OUTPUT NAME-']
-                if not outputName:
-                    outputName = 'output'
-                outputPath = currentOutputPath + outputName +'.xlsx'
-                # Export to Excel format
-                print(outputPath)
-                with pd.ExcelWriter(outputPath) as writer:
-                    output[0].to_excel(writer, sheet_name='Price', index=False)
-                    output[1].to_excel(writer, sheet_name='Quantity', index=False)
-                print('Data successfully exported in:', dt.datetime.now()-start1)
-                # Autostart file if checked by user
-                if values['-AUTO OPEN-']:
-                    os.startfile(outputPath) 
-                print('Operation complete!')
-                print('Total process runtime:', dt.datetime.now()-start)
-                print('-------------------------------------')
+            else:          
+                # Confirmation popup check
+                CONFRIMATION=sg.popup_yes_no('Please preview output data before proceed. Click Yes to Export and No to Cancel.', title='Confirmation!')
+
+                if CONFRIMATION == 'Yes':
+                    # Build Excel export structure
+                    # Price and Quantity written to dedicated sheet
+                    print('Writing data to Excel...')
+                    start1 = dt.datetime.now()
+                    # Check and compile full output path and file names
+                    outputName = values['-OUTPUT NAME-']
+                    if not outputName:
+                        outputName = 'output'
+                    outputPath = currentOutputPath + outputName +'.xlsx'
+                    # Export to Excel format
+                    print(outputPath)
+                    with pd.ExcelWriter(outputPath) as writer:
+                        output[0].to_excel(writer, sheet_name='Price', index=False)
+                        output[1].to_excel(writer, sheet_name='Quantity', index=False)
+                    print('Data successfully exported in:', dt.datetime.now()-start1)
+                    # Autostart file if checked by user
+                    if values['-AUTO OPEN-']:
+                        os.startfile(outputPath) 
+                    print('Operation complete!')
+                    print('Total process runtime:', dt.datetime.now()-start)
+                    print('-------------------------------------')
+                else:
+                    print('Operation cancelled!')
+                    print('-------------------------------------')
 
 window.close()
