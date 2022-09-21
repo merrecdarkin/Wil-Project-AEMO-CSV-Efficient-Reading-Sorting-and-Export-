@@ -182,11 +182,12 @@ while True: # GUI event loop
                 print('Writing data to Excel...')
                 start1 = dt.datetime.now()
                 # Check and compile full output path and file names
-                outputName = values['-OUTPUT NAME-']+'.xlsx'
+                outputName = values['-OUTPUT NAME-']
                 if not outputName:
-                    outputName = 'output.xlsx'
-                outputPath = currentOutputPath + outputName
+                    outputName = 'output'
+                outputPath = currentOutputPath + outputName +'.xlsx'
                 # Export to Excel format
+                print(outputPath)
                 with pd.ExcelWriter(outputPath) as writer:
                     output[0].to_excel(writer, sheet_name='Price', index=False)
                     output[1].to_excel(writer, sheet_name='Quantity', index=False)
