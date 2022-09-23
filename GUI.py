@@ -178,10 +178,10 @@ while True: # GUI event loop
             if len(DUIDset)==0:
                 previewData+=["All DUID will be exported."]
             else:
-                for i in DUIDset:
-                    previewData+=["",i,"--appeared in Price table for "+str(app.countRowFeature(output[0],i))+" row(s).","--appeared in Quality table for "+str(app.countRowFeature(output[1],i))+" row(s).","--featured BIDTYPE: "]
-                    for j in app.findTypeFeature(output[0],i):
-                        previewData+=["                "+j]
+                for DUID in DUIDset:
+                    previewData += ['',DUID,'-- appeared in Price table for '+app.rowCount(output[0],DUID)+' row(s).','-- appeared in Quality table for '+app.rowCount(output[1],DUID)+' row(s).','-- featured BIDTYPE: ']
+                    #for j in app.findTypeFeature(output[0],i):
+                        #previewData+=["                "+j]
             window["-PREVIEW LIST-"].update(previewData)
 
             # If empty output detected show popup
