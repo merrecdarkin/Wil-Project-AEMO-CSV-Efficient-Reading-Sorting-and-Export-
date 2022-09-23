@@ -170,25 +170,26 @@ while True: # GUI event loop
             # App.loadCSV() returns a tuple of (price,quantity) dataframes
             output = app.loadCSV(absoluteCSVFilePath, DUIDset, BIDTYPEset)
 
-            # Preview Function
-            previewData = []
-            previewData.append('Query processed on '+str(len(absoluteCSVFilePath))+' CSV file(s).')
-            previewData.append('Price table contained '+str(len(output[0]))+' row(s).')
-            previewData.append('Quantity table contained '+str(len(output[1]))+' row(s)')
-            if len(DUIDset)==0:
-                previewData+=["All DUID will be exported."]
-            else:
-                for DUID in DUIDset:
-                    previewData += ['',DUID,'-- appeared in Price table for '+app.rowCount(output[0],DUID)+' row(s).','-- appeared in Quality table for '+app.rowCount(output[1],DUID)+' row(s).','-- featured BIDTYPE: ']
-                    previewData += ['                           '+BIDTYPE for BIDTYPE in app.getUniqueBIDTYPE(output[1],DUID)]
-            window["-PREVIEW LIST-"].update(previewData)
-
-            # If empty output detected show popup
+            # Cancel if empty output detected
             if len(output[0]) == 0 and len(output[1]) == 0:
                 print('Operation cancelled!')
                 print('-------------------------------------')
                 sg.Popup('Output table appeared to be empty. Please check DUID and BIDTYPE input and try again!', title='Error!')
-            else:          
+            else: #process continued
+
+                # Preview Function
+                previewData = []
+                previewData.append('Query processed on '+str(len(absoluteCSVFilePath))+' CSV file(s).')
+                previewData.append('Price table contained '+str(len(output[0]))+' row(s).')
+                previewData.append('Quantity table contained '+str(len(output[1]))+' row(s)')
+                if len(DUIDset)==0:
+                    previewData+=["All DUID will be exported."]
+                else:
+                    for DUID in DUIDset:
+                        previewData += ['',DUID,'-- appeared in Price table for '+app.rowCount(output[0],DUID)+' row(s).','-- appeared in Quality table for '+app.rowCount(output[1],DUID)+' row(s).','-- featured BIDTYPE: ']
+                        previewData += ['                           '+BIDTYPE for BIDTYPE in app.getUniqueBIDTYPE(output[1],DUID)]
+                window["-PREVIEW LIST-"].update(previewData)
+        
                 # Confirmation popup check
                 CONFRIMATION=sg.popup_yes_no('Please preview output data before proceed. Click Yes to Export and No to Cancel.', title='Confirmation!')
 
