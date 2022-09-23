@@ -156,8 +156,7 @@ while True: # GUI event loop
             sg.Popup('No CSV file detected. Please change Date range or select different root Folder to try again!', title='Error!')
 
         # Execute callback when no errors found
-        if not errExport:    
-            start=dt.datetime.now()
+        if not errExport:
             print('Operation started...')
 
             # Get absolute CSV file path by concatenating the root folder path with the relative csv file path
@@ -214,7 +213,6 @@ while True: # GUI event loop
                     if values['-AUTO OPEN-']:
                         os.startfile(outputPath) 
                     print('Operation complete!')
-                    print('Total process runtime:', dt.datetime.now()-start)
                     print('-------------------------------------')
                 else:
                     print('Operation cancelled!')
