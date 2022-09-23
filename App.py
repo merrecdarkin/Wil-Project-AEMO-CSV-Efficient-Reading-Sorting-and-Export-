@@ -104,11 +104,5 @@ def rowCount(df,DUID):
     return str(len(df.query('DUID == @DUID')))
 
 #################################################################
-def findTypeFeature(sheet,DUID):
-    typeColection=[]
-    dfSheet= (pd.DataFrame(sheet))
-    queryCommand='DUID =='+'"'+ DUID+'"'
-    dfSheet=dfSheet.query(queryCommand)
-    dfSheet.drop_duplicates(subset=['BIDTYPE'])
-    typeColection=dfSheet['BIDTYPE'].to_numpy()
-    return(typeColection)
+def getUniqueBIDTYPE(df,DUID):
+    return df.query('DUID == @DUID').BIDTYPE.unique()
