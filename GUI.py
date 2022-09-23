@@ -156,8 +156,7 @@ while True: # GUI event loop
             sg.Popup('No CSV file detected. Please change Date range or select different root Folder to try again!', title='Error!')
 
         # Execute callback when no errors found
-        if not errExport:    
-            start=dt.datetime.now()
+        if not errExport:
             print('Operation started...')
 
             # Get absolute CSV file path by concatenating the root folder path with the relative csv file path
@@ -171,26 +170,26 @@ while True: # GUI event loop
             # App.loadCSV() returns a tuple of (price,quantity) dataframes
             output = app.loadCSV(absoluteCSVFilePath, DUIDset, BIDTYPEset)
 
-            # Preview Function
-            previewData = []
-            previewData.append('Query processed on '+str(len(absoluteCSVFilePath))+' CSV file(s).')
-            previewData.append('Price table contained '+str(len(output[0]))+' row(s).')
-            previewData.append('Quantity table contained '+str(len(output[1]))+' row(s)')
-            if len(DUIDset)==0:
-                previewData+=["All DUID will be exported."]
-            else:
-                for i in DUIDset:
-                    previewData+=["",i,"--appeared in Price table for "+str(app.countRowFeature(output[0],i))+" row(s).","--appeared in Quality table for "+str(app.countRowFeature(output[1],i))+" row(s).","--featured BIDTYPE: "]
-                    for j in app.findTypeFeature(output[0],i):
-                        previewData+=["                "+j]
-            window["-PREVIEW LIST-"].update(previewData)
-
-            # If empty output detected show popup
+            # Cancel if empty output detected
             if len(output[0]) == 0 and len(output[1]) == 0:
                 print('Operation cancelled!')
                 print('-------------------------------------')
                 sg.Popup('Output table appeared to be empty. Please check DUID and BIDTYPE input and try again!', title='Error!')
-            else:          
+            else: #process continued
+
+                # Preview Function
+                previewData = []
+                previewData.append('Query processed on '+str(len(absoluteCSVFilePath))+' CSV file(s).')
+                previewData.append('Price table contained '+str(len(output[0]))+' row(s).')
+                previewData.append('Quantity table contained '+str(len(output[1]))+' row(s)')
+                if len(DUIDset)==0:
+                    previewData+=["All DUID will be exported."]
+                else:
+                    for DUID in DUIDset:
+                        previewData += ['',DUID,'-- appeared in Price table for '+app.rowCount(output[0],DUID)+' row(s).','-- appeared in Quality table for '+app.rowCount(output[1],DUID)+' row(s).','-- featured BIDTYPE: ']
+                        previewData += ['                           '+BIDTYPE for BIDTYPE in app.getUniqueBIDTYPE(output[1],DUID)]
+                window["-PREVIEW LIST-"].update(previewData)
+        
                 # Confirmation popup check
                 CONFRIMATION=sg.popup_yes_no('Please preview output data before proceed. Click Yes to Export and No to Cancel.', title='Confirmation!')
 
@@ -214,7 +213,6 @@ while True: # GUI event loop
                     if values['-AUTO OPEN-']:
                         os.startfile(outputPath) 
                     print('Operation complete!')
-                    print('Total process runtime:', dt.datetime.now()-start)
                     print('-------------------------------------')
                 else:
                     print('Operation cancelled!')

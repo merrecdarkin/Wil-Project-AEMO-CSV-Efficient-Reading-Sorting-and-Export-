@@ -100,15 +100,9 @@ def invalidDateFormat(dateString):
             return True
 
 #################################################################
-def countRowFeature(sheet,DUID):
-    return(len(sheet[sheet['DUID'] == DUID])) #count row featured this DUID
+def rowCount(df,DUID):
+    return str(len(df.query('DUID == @DUID')))
 
 #################################################################
-def findTypeFeature(sheet,DUID):
-    typeColection=[]
-    dfSheet= (pd.DataFrame(sheet))
-    queryCommand='DUID =='+'"'+ DUID+'"'
-    dfSheet=dfSheet.query(queryCommand)
-    dfSheet.drop_duplicates(subset=['BIDTYPE'], inplace=True) #set aside bitype in this DUID
-    typeColection=dfSheet['BIDTYPE'].to_numpy()
-    return(typeColection)
+def getUniqueBIDTYPE(df,DUID):
+    return df.query('DUID == @DUID').BIDTYPE.unique()
