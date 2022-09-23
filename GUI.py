@@ -180,8 +180,7 @@ while True: # GUI event loop
             else:
                 for DUID in DUIDset:
                     previewData += ['',DUID,'-- appeared in Price table for '+app.rowCount(output[0],DUID)+' row(s).','-- appeared in Quality table for '+app.rowCount(output[1],DUID)+' row(s).','-- featured BIDTYPE: ']
-                    #for j in app.findTypeFeature(output[0],i):
-                        #previewData+=["                "+j]
+                    previewData += ['                           '+BIDTYPE for BIDTYPE in app.getUniqueBIDTYPE(output[1],DUID)]
             window["-PREVIEW LIST-"].update(previewData)
 
             # If empty output detected show popup
