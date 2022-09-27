@@ -53,24 +53,28 @@ layout = [
                             [sg.Checkbox('Autostart Excel file after export?',key="-AUTO OPEN-")]
                         ]
                     ),
-                    sg.Column(
-                        [   # Confirmation buttons
-                            [sg.Button(' SET DATE ', key = '-SET DATE-')],
-                            [sg.Button('   EXPORT  ', key = '-EXPORT-')]                            
-                        ]
-                    )
+                    #sg.Column(
+                    #    [   # Confirmation buttons
+                    #        [sg.Button(' SET DATE ', key = '-SET DATE-')],
+                    #        [sg.Button('   EXPORT  ', key = '-EXPORT-')]                            
+                    #    ]
+                    #)
                 ], 
                 # RIGHT MAIN COLUMN LOWER SECTION: Preview console
                 [sg.Text('Preview Data:')],
-                [sg.Listbox(values=[], enable_events=True, size=(60,10), key='-PREVIEW LIST-')]
+                [sg.Listbox(values=[], enable_events=True, size=(50,10), key='-PREVIEW LIST-')]
             ]
         ),
 
         sg.Column(
             [
                 [sg.Text('Select BIDTYPE(s):')],
-                [sg.Listbox(['ENERGY','LOWER5MIN','LOWER60SEC','LOWER6SEC','LOWERREG','RAISE5MIN','RAISE60SEC','RAISE6SEC','RAISEREG'], enable_events=True, size=(20,9), select_mode=sg.LISTBOX_SELECT_MODE_MULTIPLE, key="-INPUT BIDTYPE-")]
-            ]
+                [sg.Listbox(['ENERGY','LOWER5MIN','LOWER60SEC','LOWER6SEC','LOWERREG','RAISE5MIN','RAISE60SEC','RAISE6SEC','RAISEREG'], enable_events=True, size=(20,9), select_mode=sg.LISTBOX_SELECT_MODE_MULTIPLE, key="-INPUT BIDTYPE-")],
+                [sg.VPush()],
+                [sg.Button(' SET DATE ', size=(10,4), key = '-SET DATE-')],
+                [sg.VPush()],
+                [sg.Button('   EXPORT  ', size=(10,4), key = '-EXPORT-')]
+            ], element_justification='c'
         )
 
     ]
