@@ -11,7 +11,7 @@ currentOutputPath = ''
 relativeCSVFilePath = []
 
 layout = [
-    [   # LEFT MAIN COLUMN: Folder browser bar, CSV file list
+    [   # LEFT COLUMN: Folder browser bar, CSV file list
         sg.Column( 
             [ 
                 [   # Folder browser bar
@@ -36,9 +36,9 @@ layout = [
 
         sg.VSeperator(), # Vertical line separator between 2 columns
 
-        # RIGHT MAIN COLUMN: Data input filter, Preview console
+        # MIDDLE COLUMN: Data input filter, Preview console
         sg.Column(
-            [   # RIGHT MAIN COLUMN UPPER SECTION: Filter input, Confirmation buttons
+            [   # MIDDLE COLUMN UPPER: Filter text field input
                 [
                     sg.Column( 
                         [   # Text field input by user as data filter
@@ -54,12 +54,13 @@ layout = [
                         ]
                     ),
                 ], 
-                # RIGHT MAIN COLUMN LOWER SECTION: Preview console
+                # MIDDLE COLUMN LOWER: Preview section
                 [sg.Text('Preview Data:')],
                 [sg.Listbox(values=[], enable_events=True, size=(50,10), key='-PREVIEW LIST-')]
             ]
         ),
 
+        # RIGHT COLUMN: Bidtype selection listbox, Confirmation buttons
         sg.Column(
             [
                 [sg.Text('Select BIDTYPE(s):')],
@@ -190,7 +191,7 @@ while True: # GUI event loop
                     previewData+=["All DUID will be exported."]
                 else:
                     for DUID in DUIDset:
-                        previewData += ['',DUID,'-- appeared in Price table for '+app.rowCount(output[0],DUID)+' row(s).','-- appeared in Quality table for '+app.rowCount(output[1],DUID)+' row(s).','-- featured BIDTYPE: ']
+                        previewData += ['',DUID,'-- appeared in Price table for '+app.rowCount(output[0],DUID)+' row(s).','-- appeared in Quantity table for '+app.rowCount(output[1],DUID)+' row(s).','-- featured BIDTYPE: ']
                         previewData += ['                           '+BIDTYPE for BIDTYPE in app.getUniqueBIDTYPE(output[1],DUID)]
                 window["-PREVIEW LIST-"].update(previewData)
         
