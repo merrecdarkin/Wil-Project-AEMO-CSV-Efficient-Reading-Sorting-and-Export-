@@ -53,12 +53,6 @@ layout = [
                             [sg.Checkbox('Autostart Excel file after export?',key="-AUTO OPEN-")]
                         ]
                     ),
-                    #sg.Column(
-                    #    [   # Confirmation buttons
-                    #        [sg.Button(' SET DATE ', key = '-SET DATE-')],
-                    #        [sg.Button('   EXPORT  ', key = '-EXPORT-')]                            
-                    #    ]
-                    #)
                 ], 
                 # RIGHT MAIN COLUMN LOWER SECTION: Preview console
                 [sg.Text('Preview Data:')],
@@ -174,7 +168,7 @@ while True: # GUI event loop
             
             # Get DUID and BIDTYPE filter input from user, split by space and convert to UPPERCASE to match source data format
             DUIDset = [x.upper() for x in values['-INPUT DUID-'].split()]
-            BIDTYPEset = [x.upper() for x in values['-INPUT BIDTYPE-'].split()]
+            BIDTYPEset = values['-INPUT BIDTYPE-']
             
             # Read CSV and query based on user filters
             # App.loadCSV() returns a tuple of (price,quantity) dataframes
