@@ -48,8 +48,6 @@ layout = [
                             [sg.InputText(key='-INPUT DATE END-'), sg.CalendarButton('⮟', no_titlebar=False, title='Set End Date', target='-INPUT DATE END-', format='%Y/%m/%d', button_color=('black','white'))],
                             [sg.Text('DUID(s) (separated by space) e.g. BLUFF1 YWPS4 ')],
                             [sg.InputText(key = '-INPUT DUID-')],
-                            [sg.Text('BIDTYPE(s) (separated by space) e.g. ENERGY ')],
-                            [sg.InputText(key = '-INPUT BIDTYPE-')],
                             [sg.Text('Specify export file name (optional) ')],
                             [sg.InputText(key = '-OUTPUT NAME-')],
                             [sg.Checkbox('Autostart Excel file after export?',key="-AUTO OPEN-")]
@@ -66,7 +64,15 @@ layout = [
                 [sg.Text('Preview Data:')],
                 [sg.Listbox(values=[], enable_events=True, size=(60,10), key='-PREVIEW LIST-')]
             ]
+        ),
+
+        sg.Column(
+            [
+                [sg.Text('Select BIDTYPE(s):')],
+                [sg.Listbox(['ENERGY','LOWER5MIN','LOWER60SEC','LOWER6SEC','LOWERREG','RAISE5MIN','RAISE60SEC','RAISE6SEC','RAISEREG'], enable_events=True, size=(20,9), select_mode=sg.LISTBOX_SELECT_MODE_MULTIPLE, key="-INPUT BIDTYPE-")]
+            ]
         )
+
     ]
 ]
 
