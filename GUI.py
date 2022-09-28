@@ -11,7 +11,7 @@ currentOutputPath = ''
 relativeCSVFilePath = []
 
 layout = [
-    [   # LEFT MAIN COLUMN: Folder browser bar, CSV file list
+    [   # LEFT COLUMN: Folder browser bar, CSV file list
         sg.Column( 
             [ 
                 [   # Folder browser bar
@@ -36,9 +36,9 @@ layout = [
 
         sg.VSeperator(), # Vertical line separator between 2 columns
 
-        # RIGHT MAIN COLUMN: Data input filter, Preview console
+        # MIDDLE COLUMN: Data input filter, Preview console
         sg.Column(
-            [   # RIGHT MAIN COLUMN UPPER SECTION: Filter input, Confirmation buttons
+            [   # MIDDLE COLUMN UPPER: Filter text field input
                 [
                     sg.Column( 
                         [   # Text field input by user as data filter
@@ -48,25 +48,30 @@ layout = [
                             [sg.InputText(key='-INPUT DATE END-'), sg.CalendarButton('⮟', no_titlebar=False, title='Set End Date', target='-INPUT DATE END-', format='%Y/%m/%d', button_color=('black','white'))],
                             [sg.Text('DUID(s) (separated by space) e.g. BLUFF1 YWPS4 ')],
                             [sg.InputText(key = '-INPUT DUID-')],
-                            [sg.Text('BIDTYPE(s) (separated by space) e.g. ENERGY ')],
-                            [sg.InputText(key = '-INPUT BIDTYPE-')],
                             [sg.Text('Specify export file name (optional) ')],
                             [sg.InputText(key = '-OUTPUT NAME-')],
                             [sg.Checkbox('Autostart Excel file after export?',key="-AUTO OPEN-")]
                         ]
                     ),
-                    sg.Column(
-                        [   # Confirmation buttons
-                            [sg.Button(' SET DATE ', key = '-SET DATE-')],
-                            [sg.Button('   EXPORT  ', key = '-EXPORT-')]                            
-                        ]
-                    )
                 ], 
-                # RIGHT MAIN COLUMN LOWER SECTION: Preview console
+                # MIDDLE COLUMN LOWER: Preview section
                 [sg.Text('Preview Data:')],
-                [sg.Listbox(values=[], enable_events=True, size=(60,10), key='-PREVIEW LIST-')]
+                [sg.Listbox(values=[], enable_events=True, size=(50,10), key='-PREVIEW LIST-')]
             ]
+        ),
+
+        # RIGHT COLUMN: Bidtype selection listbox, Confirmation buttons
+        sg.Column(
+            [
+                [sg.Text('Select BIDTYPE(s):')],
+                [sg.Listbox(['ENERGY','LOWER5MIN','LOWER60SEC','LOWER6SEC','LOWERREG','RAISE5MIN','RAISE60SEC','RAISE6SEC','RAISEREG'], enable_events=True, size=(20,9), select_mode=sg.LISTBOX_SELECT_MODE_MULTIPLE, key="-INPUT BIDTYPE-")],
+                [sg.VPush()],
+                [sg.Button(' SET DATE ', size=(10,4), key = '-SET DATE-')],
+                [sg.VPush()],
+                [sg.Button('   EXPORT  ', size=(10,4), key = '-EXPORT-')]
+            ], element_justification='c'
         )
+
     ]
 ]
 
@@ -164,7 +169,7 @@ while True: # GUI event loop
             
             # Get DUID and BIDTYPE filter input from user, split by space and convert to UPPERCASE to match source data format
             DUIDset = [x.upper() for x in values['-INPUT DUID-'].split()]
-            BIDTYPEset = [x.upper() for x in values['-INPUT BIDTYPE-'].split()]
+            BIDTYPEset = values['-INPUT BIDTYPE-']
             
             # Read CSV and query based on user filters
             # App.loadCSV() returns a tuple of (price,quantity) dataframes
@@ -186,7 +191,7 @@ while True: # GUI event loop
                     previewData+=["All DUID will be exported."]
                 else:
                     for DUID in DUIDset:
-                        previewData += ['',DUID,'-- appeared in Price table for '+app.rowCount(output[0],DUID)+' row(s).','-- appeared in Quality table for '+app.rowCount(output[1],DUID)+' row(s).','-- featured BIDTYPE: ']
+                        previewData += ['',DUID,'-- appeared in Price table for '+app.rowCount(output[0],DUID)+' row(s).','-- appeared in Quantity table for '+app.rowCount(output[1],DUID)+' row(s).','-- featured BIDTYPE: ']
                         previewData += ['                           '+BIDTYPE for BIDTYPE in app.getUniqueBIDTYPE(output[1],DUID)]
                 window["-PREVIEW LIST-"].update(previewData)
         
