@@ -91,7 +91,9 @@ while True: # GUI event loop
         currentFolderPath= values["-FOLDER-"]
         
         # Get all valid CSV file paths relatively to the current dir (recursive match in all sub-dir)
-        relativeCSVFilePath = glob.glob('**/PUBLIC_BIDMOVE_COMPLETE*.csv', root_dir=currentFolderPath, recursive=True)
+        rawRelativeCSVFilePath = glob.glob('**/PUBLIC_BIDMOVE_COMPLETE*.csv', root_dir=currentFolderPath, recursive=True)
+        # Remove duplicate csv file name in subdir
+        [relativeCSVFilePath.append(f) for f in rawRelativeCSVFilePath if os.path.basename(f) not in relativeCSVFilePath]
         
         # Slice CSV file names from full file paths
         CSVFileName = [os.path.basename(f) for f in relativeCSVFilePath]
@@ -123,8 +125,9 @@ while True: # GUI event loop
         # Execute callback when no errors found
         if not errSetDate:    
             # Reset/refetch CSV file path (if root directory or date range changed by user)
-            relativeCSVFilePath = glob.glob('**/PUBLIC_BIDMOVE_COMPLETE*.csv', root_dir=currentFolderPath, recursive=True)
-            
+            rawRelativeCSVFilePath = glob.glob('**/PUBLIC_BIDMOVE_COMPLETE*.csv', root_dir=currentFolderPath, recursive=True)
+            # Remove duplicate csv file name in subdir
+            [relativeCSVFilePath.append(f) for f in rawRelativeCSVFilePath if os.path.basename(f) not in relativeCSVFilePath]
             # Check for invalid date format
             if app.invalidDateFormat(values['-INPUT DATE START-']) or app.invalidDateFormat(values['-INPUT DATE END-']):
                 sg.Popup('Wrong date format detected. Please try "YYYY/MM/DD" again!', title='Error!')
