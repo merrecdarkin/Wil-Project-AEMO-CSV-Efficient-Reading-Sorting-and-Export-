@@ -207,7 +207,7 @@ while True: # GUI event loop
                     print('Writing data to Excel...')
                     start1 = dt.datetime.now()
                     # Check and compile full output path and file names
-                    outputName = values['-OUTPUT NAME-']
+                    outputName = values['-OUTPUT NAME-'].replace('/', '')
                     if not outputName:
                         outputName = 'output'
                     outputPath = currentOutputPath + outputName +'.xlsx'
