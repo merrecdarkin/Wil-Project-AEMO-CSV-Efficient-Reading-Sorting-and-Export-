@@ -76,7 +76,7 @@ def filterCSVDate(relativeCSVFilePath,dateStart,dateEnd):
 
     for f in relativeCSVFilePath:
         # Get the date string part from each CSV file name
-        dateStringInCSV = f[f.find('_COMPLETE_')+10:f.find('_COMPLETE_')+18]
+        dateStringInCSV = f[f.rfind('_COMPLETE_')+10:f.rfind('_COMPLETE_')+18]
         # Convert date string to int and compare in date range, add to output list if valid
         if dateStart <= int(dateStringInCSV) <= dateEnd:
             validCSVFilePath.append(f)
