@@ -93,6 +93,7 @@ while True: # GUI event loop
         # Get all valid CSV file paths relatively to the current dir (recursive match in all sub-dir)
         rawRelativeCSVFilePath = glob.glob('**/PUBLIC_BIDMOVE_COMPLETE*.csv', root_dir=currentFolderPath, recursive=True)
         # Remove duplicate csv file name in subdir
+        relativeCSVFilePath = []
         [relativeCSVFilePath.append(f) for f in rawRelativeCSVFilePath if os.path.basename(f) not in relativeCSVFilePath]
         
         # Slice CSV file names from full file paths
@@ -127,6 +128,7 @@ while True: # GUI event loop
             # Reset/refetch CSV file path (if root directory or date range changed by user)
             rawRelativeCSVFilePath = glob.glob('**/PUBLIC_BIDMOVE_COMPLETE*.csv', root_dir=currentFolderPath, recursive=True)
             # Remove duplicate csv file name in subdir
+            relativeCSVFilePath = []
             [relativeCSVFilePath.append(f) for f in rawRelativeCSVFilePath if os.path.basename(f) not in relativeCSVFilePath]
             # Check for invalid date format
             if app.invalidDateFormat(values['-INPUT DATE START-']) or app.invalidDateFormat(values['-INPUT DATE END-']):
