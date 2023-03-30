@@ -1,6 +1,6 @@
 An undergraduated [Work-integrated learning](https://www.griffith.edu.au/enrich-your-studies/work-integrated-learning) project for my [Bachelor of Information Technology](https://www.griffith.edu.au/study/degrees/bachelor-of-information-technology-1538) degree.
 
-The project delivers a Windows app that provides **interactive GUI**, **data processing**, and **data export** functionality from the client's raw data source, utilising [pandas](https://pandas.pydata.org/), an open-source data analysis library, and other supplementary [Python](https://www.python.org/) frameworks.
+The project delivers a Windows application that provides **interactive GUI**, **data processing**, and **data export** functionality from the client's raw data source, utilising [pandas](https://pandas.pydata.org/), an open-source data analysis library, and other supplementary [Python](https://www.python.org/) frameworks.
 
 The project received [Finalist Place for The Best Innovative Project in Trimester 2, 2022](https://drive.google.com/file/d/1KgHNuUkKHJ_I-4aHQvx8IObYiW26RZeG) of the [FirstWave Awards](https://www.griffith.edu.au/griffith-sciences/school-information-communication-technology/industry/firstwave-awards).
 
