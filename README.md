@@ -1,8 +1,8 @@
-An undergraduated [Work-integrated learning](https://www.griffith.edu.au/enrich-your-studies/work-integrated-learning) project for my [Bachelor of Information Technology](https://www.griffith.edu.au/study/degrees/bachelor-of-information-technology-1538) degree.
+An undergraduate [work-integrated learning](https://www.griffith.edu.au/enrich-your-studies/work-integrated-learning) project for my [Bachelor of Information Technology](https://www.griffith.edu.au/study/degrees/bachelor-of-information-technology-1538) degree.
 
-The project delivers a Windows application that provides **interactive GUI**, **data processing**, and **data export** functionality from the client's raw data source, utilising [pandas](https://pandas.pydata.org/), an open-source data analysis library, and other supplementary [Python](https://www.python.org/) frameworks.
+The project delivers a Windows application that provides **interactive GUI**, **data processing**, and **data extraction** functionality from the client's raw data source, utilising [pandas](https://pandas.pydata.org/), an open-source data analysis library, and other supplementary [Python](https://www.python.org/) frameworks.
 
-The project received [Finalist Place for The Best Innovative Project in Trimester 2, 2022](https://drive.google.com/file/d/1KgHNuUkKHJ_I-4aHQvx8IObYiW26RZeG) of the [FirstWave Awards](https://www.griffith.edu.au/griffith-sciences/school-information-communication-technology/industry/firstwave-awards).
+The project received [Finalist Place](https://drive.google.com/file/d/1KgHNuUkKHJ_I-4aHQvx8IObYiW26RZeG) for The Best Innovative Project in Trimester 2, 2022 of the [FirstWave Awards](https://www.griffith.edu.au/griffith-sciences/school-information-communication-technology/industry/firstwave-awards).
 
 <img src='docs/thumbnail.png'/>
 
@@ -12,17 +12,17 @@ The project received [Finalist Place for The Best Innovative Project in Trimeste
     - [Data Download Sources](#data-download-sources)
 - [Application Features](#application-features)
     - [Import Data and Initial Filter](#import-data-and-initial-filter)
-    - [Multiple Queries Filter](#multiple-queries-filter)
-    - [Data Separation and Duplication Purge](#data-separation-and-duplication-purge)
-        - [Stacked Raw Data Problem](#stacked-raw-data-problem)
+    - [Multiple Query Filter](#multiple-query-filter)
+    - [Data Separation and Duplication Detection](#data-separation-and-duplication-detection)
+        - [Data Stacked Problem](#data-stacked-problem)
         - [Data Duplication Problem](#data-duplication-problem)
-    - [Output Data and Export](#output-data-and-export)
-    - [Error Handling & Troubleshooting](#error-handling--troubleshooting)
+    - [Output and Export](#output-and-export)
+    - [Error Handling and Troubleshooting](#error-handling-and-troubleshooting)
 - [Extras](#extras)
     - [Clone and Build](#clone-and-build)
         - [Install required packages](#install-required-packages)
         - [Build into executable](#build-into-executable)
-        - [Small note about cloning and building from source](#small-note-about-cloning-and-building-from-source)
+        - [Notes about cloning and building](#notes-about-cloning-and-building)
     - [Changelog and Releases](#changelog-and-releases)
         
 ## Project Overview
@@ -89,7 +89,7 @@ Filter result:
 
 <img src='docs/import-3.png' style='width:300px'/>
 
-### Multiple Queries Filter
+### Multiple Query Filter
 
 Per client requirements, the user can use a combination of multiple `Device Unit Identifiers (DUID)` and `BIDTYPE`.
 
@@ -99,9 +99,9 @@ After clicking `EXPORT`, the user is prompted with a confirmation dialog and a b
 
 <img src='docs/filter-2.png' style='width:300px'/>
 
-### Data Separation and Duplication Purge
+### Data Separation and Duplication Detection
 
-#### Stacked Raw Data Problem
+#### Data Stacked Problem
 
 A single CSV file records 24-hour of bidding data. However, in each file, there are **two different tables** stacking on each other, that represent **two different data types**, which are the `bidding price` and the `MWh quantity` that form `"the coupled band-based price/quantity data"` _(see project overview for more details)_.
 
@@ -143,7 +143,7 @@ An example query of 2 `DUID` and 3 `BIDTYPE` in a range of 3 days _(over **1 mil
 
 <img src='docs/dup-3.png' style='width:500px'/>
 
-### Output Data and Export
+### Output and Export
 
 For client requirements, the app exports to Excel `.xlsx` file format.
 
@@ -159,7 +159,7 @@ For example, if you leave custom name empty, any subsequent run of the app will 
 
 Thus, it is highly recommended to specify an unique custom name for each run to avoid data loss.
 
-### Error Handling & Troubleshooting
+### Error Handling and Troubleshooting
 
 - ##### Anything actions when no root folder is specified
     <img src='docs/err-1.png' style='width:400px'/>
@@ -207,7 +207,7 @@ The script use `PyInstaller` package to build from the source code, so make sure
 
 Also, make sure to have the batch scripts in the same directory as both `App.py` and `GUI.py`.
 
-#### Small note about cloning and building from source
+#### Notes about cloning and building
 
 The original purposes of these scripts were to aid development process and provide my teammates the option to quickly setup the dev environment on their machines to start debugging and testing.
 
