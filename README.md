@@ -1,4 +1,4 @@
-# AEMO Data Extraction Tool
+# AEMO Data Tool
 
 <img src='docs/thumbnail.png'/>
 
