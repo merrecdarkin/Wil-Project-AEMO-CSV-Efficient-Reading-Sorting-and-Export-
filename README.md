@@ -1,4 +1,4 @@
-# AEMO Data Tool
+# AEMO Data App
 
 ![og](docs/_og.png)
 
