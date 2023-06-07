@@ -1,61 +1,69 @@
 # AEMO Data Tool
 
-<img src='docs/thumbnail.png'/>
+![og](docs/_og.png)
 
-An undergraduate [work-integrated learning](https://www.griffith.edu.au/enrich-your-studies/work-integrated-learning) project for my [Bachelor of Information Technology](https://www.griffith.edu.au/study/degrees/bachelor-of-information-technology-1538) degree.
+---
 
-The project delivers a Windows application that provides **interactive GUI**, **data processing**, and **data extraction** functionality from the client's raw data source, utilising [pandas](https://pandas.pydata.org/), an open-source data analysis library, and other supplementary [Python](https://www.python.org/) frameworks.
+Undergraduate [work-integrated](https://www.griffith.edu.au/enrich-your-studies/work-integrated-learning) learning project for my Bachelor degree.
+
+The project delivers a Windows application that provides an **interactive GUI**, **data processing** and **data extraction** features for the Australian Energy Market Operator raw dataset.
+
+The project utilises [pandas](https://pandas.pydata.org/) - an open-source data analysis library, and other supplementary [Python](https://www.python.org/) frameworks.
 
 The project received [Finalist Place](https://drive.google.com/file/d/1KgHNuUkKHJ_I-4aHQvx8IObYiW26RZeG) for The Best Innovative Project in Trimester 2, 2022 of the [FirstWave Awards](https://www.griffith.edu.au/griffith-sciences/school-information-communication-technology/industry/firstwave-awards).
+
+---
 
 ## Table of Content
 
 - [Project Overview](#project-overview)
-    - [Data Download Sources](#data-download-sources)
+  - [Data Download Sources](#data-download-sources)
 - [Application Features](#application-features)
-    - [Import Data and Initial Filter](#import-data-and-initial-filter)
-    - [Multiple Query Filter](#multiple-query-filter)
-    - [Data Separation and Duplication Detection](#data-separation-and-duplication-detection)
-        - [Data Stacked Problem](#data-stacked-problem)
-        - [Data Duplication Problem](#data-duplication-problem)
-    - [Output and Export](#output-and-export)
-    - [Error Handling and Troubleshooting](#error-handling-and-troubleshooting)
+  - [Import Data and Filter](#import-data-and-filter)
+  - [Multiple Query Filter](#multiple-query-filter)
+  - [Data Processing](#data-processing)
+    - [Data Stacking Problem](#data-stacking-problem)
+    - [Data Duplication Problem](#data-duplication-problem)
+  - [Output and Export](#output-and-export)
+  - [Error Handling and Troubleshooting](#error-handling-and-troubleshooting)
 - [Extras](#extras)
-    - [Clone and Build](#clone-and-build)
-        - [Install required packages](#install-required-packages)
-        - [Build into executable](#build-into-executable)
-        - [Notes about cloning and building](#notes-about-cloning-and-building)
-    - [Changelog and Releases](#changelog-and-releases)
-        
+  - [Clone and Build](#clone-and-build)
+    - [Install required packages](#install-required-packages)
+    - [Build into executable](#build-into-executable)
+    - [Notes on building source](#notes-on-building-source)
+- [Changelog and Releases](#changelog-and-releases)
+
+---
+
 ## Project Overview
 
 <details>
 <summary>Client Details and Project Requirements</summary>
 <br/>
 
-"The project will seek to develop an efficient and effective data extraction process for use by Griffith University’s Centre for Applied Energy Economics and Policy Research (CAEEPR) to extract band-based generator price and supply offer data supplied to the Australian Energy Market Operator (AEMO) as part of the wholesale market operations of the National Electricity Market (NEM).
+_"The project will seek to develop an efficient and effective data extraction process for use by Griffith University’s Centre for Applied Energy Economics and Policy Research (CAEEPR) to extract band-based generator price and supply offer data supplied to the Australian Energy Market Operator (AEMO) as part of the wholesale market operations of the National Electricity Market (NEM)._
 
-This data includes coupled ($/MWh) price and MWh quantity data supplied to AEMO by generators over ten price/quantity bands that defines each generators piecewise-linear supply function offered to AEMO as required under the National Electricity Rules (NER).
+_This data includes coupled ($/MWh) price and MWh quantity data supplied to AEMO by generators over ten price/quantity bands that defines each generators piecewise-linear supply function offered to AEMO as required under the National Electricity Rules (NER)._
 
-The coupled band-based price/quantity data is released in a series of zip files containing csv files relating to supply offers of all generators competing in the NEM that are located in Queensland, New South Wales, Victoria, South Australia and Tasmania and includes thermal, hydro and renewable energy generators.
+_The coupled band-based price/quantity data is released in a series of zip files containing csv files relating to supply offers of all generators competing in the NEM that are located in Queensland, New South Wales, Victoria, South Australia and Tasmania and includes thermal, hydro and renewable energy generators._
 
-Information relating to the time and frequency of changes in the generator price and quantity bands is depicted in the csv files and would have to be extracted from time stamps included in the files that identify when changes occur and what price/quantity changes were invoked. Given the large number of generators involved, high frequency of changes, and substantial time over which the NEM has been running (since 1998), this project would be addressing a large data problem.
+_Information relating to the time and frequency of changes in the generator price and quantity bands is depicted in the csv files and would have to be extracted from time stamps included in the files that identify when changes occur and what price/quantity changes were invoked. Given the large number of generators involved, high frequency of changes, and substantial time over which the NEM has been running (since 1998), this project would be addressing a large data problem._
 
-To-date, CAEEPR has not attempted to extract this data but realise it will be very valuable for future research undertaken at CAEEPR, principally permitting different bidding strategies linked to observed behaviour of generators to be investigated. Thus, the project team is likely to have considerable flexibility in determining how to extract this data, consistent with the broad CAEEPR objectives to be listed below.
+_To-date, CAEEPR has not attempted to extract this data but realise it will be very valuable for future research undertaken at CAEEPR, principally permitting different bidding strategies linked to observed behaviour of generators to be investigated. Thus, the project team is likely to have considerable flexibility in determining how to extract this data, consistent with the broad CAEEPR objectives to be listed below._
 
-The key objectives being sought by CAEEPR is: (1) a set of code that can read in the csv files obtained from AEMO; (2) extract the data in a convenient format to be determined by the project team in consultation with CAEEPR; and (3) enable a search to be undertaken to extract band-based supply-offer bids (e.g. both price and quantity couples) of one or more generators and with this extraction process being capable of writing the generator based data to an excel file.
+_The key objectives being sought by CAEEPR is: (1) a set of code that can read in the csv files obtained from AEMO; (2) extract the data in a convenient format to be determined by the project team in consultation with CAEEPR; and (3) enable a search to be undertaken to extract band-based supply-offer bids (e.g. both price and quantity couples) of one or more generators and with this extraction process being capable of writing the generator based data to an excel file._
 
-Another key objective is to minimize 'hands on' activity required by CAEEPR staff in the actual extraction process. As mentioned above, a capability should be embedded in the software whereby CAEEPR staff can supply one or more generator identifiers consistent with AEMO identifier protocols and the band-based data is extracted and copied to an excel file for that generator or spreadsheets in an excel work file for a set of generators.
+_Another key objective is to minimize 'hands on' activity required by CAEEPR staff in the actual extraction process. As mentioned above, a capability should be embedded in the software whereby CAEEPR staff can supply one or more generator identifiers consistent with AEMO identifier protocols and the band-based data is extracted and copied to an excel file for that generator or spreadsheets in an excel work file for a set of generators._
 
-Another key objective of CAEEPR is optimising the efficiency of data extraction by improving the computing speed of the data extraction operation as well as memory utilization and management of this process, including storage options for the completed product - e.g., Dropbox, OneDrive or another server-based option.
+_Another key objective of CAEEPR is optimising the efficiency of data extraction by improving the computing speed of the data extraction operation as well as memory utilization and management of this process, including storage options for the completed product - e.g., Dropbox, OneDrive or another server-based option._
 
-Desirable Skills - CAEEPR has no pre-existing requirements although some experience with data analytics, coding/software development and information systems would be advantageous.
+_Desirable Skills - CAEEPR has no pre-existing requirements although some experience with data analytics, coding/software development and information systems would be advantageous._
 
-Additional Details - The skills and knowledge gained by the individual/team would be of particular interest to companies operating in the electricity industry including generation and network companies as well as Government regulatory bodies and departments.
+_Additional Details - The skills and knowledge gained by the individual/team would be of particular interest to companies operating in the electricity industry including generation and network companies as well as Government regulatory bodies and departments._
 
-There is also the prospect of post-graduate level projects particularly addressing Java program optimization to enhance the ability to employ Monte Carlo sampling methods and multi-threads or parallel processing within the structure of the current model software."
+_There is also the prospect of post-graduate level projects particularly addressing Java program optimization to enhance the ability to employ Monte Carlo sampling methods and multi-threads or parallel processing within the structure of the current model software."_
 
-\- _CAEEPR (2022)_
+CAEEPR (2022)
 
 </details>
 
@@ -67,7 +75,7 @@ There is also the prospect of post-graduate level projects particularly addressi
 
 ## Application Features
 
-### Import Data and Initial Filter
+### Import Data and Filter
 
 The app can import multiple .csv files that match the AEMO name pattern `PUBLIC_BIDMOVE_COMPLETE_YYYYMMDD` from a parent folder. The app also scans for all children folder recursively to find all valid files.
 
@@ -101,9 +109,9 @@ After clicking `EXPORT`, the user is prompted with a confirmation dialog and a b
 
 <img src='docs/filter-2.png' style='width:300px'/>
 
-### Data Separation and Duplication Detection
+### Data Processing
 
-#### Data Stacked Problem
+#### Data Stacking Problem
 
 A single CSV file records 24-hour of bidding data. However, in each file, there are **two different tables** stacking on each other, that represent **two different data types**, which are the `bidding price` and the `MWh quantity` that form `"the coupled band-based price/quantity data"` _(see project overview for more details)_.
 
@@ -171,9 +179,9 @@ Thus, it is highly recommended to specify an unique custom name for each run to 
     <img src='docs/err-3.png' style='width:400px'/>
 - ##### Check for empty output
     <img src='docs/err-4.png' style='width:400px'/>
-- ##### Q: What happens if you leave DUID input empty?
+- ##### Q: What happens if I leave DUID input empty?
   A: The app exports **all** `DUID` data, but after duplication purging of course. This is also a good method to only trim/debloat the raw table without the need to inspect specific `DUID(s)`.
-- ##### Q: What happens if you leave BIDTYPE input empty?
+- ##### Q: What happens if I leave BIDTYPE input empty?
   A: Same with `DUID`. Again, selecting a single `DUID` while leaving `BIDTYPE` empty will export **all** bid types for that specific device ID.
 - ##### Q: I tried exporting all DUID but the output was not sorted chronologically as you mentioned?
   A: The client required the output to be grouped by `DUID`. So, for export of multiple device IDs with a period more than 1-day, the output will **first** be grouped into sections by `DUID`, **then** in each `DUID` block, the rows are **sorted** by `SETTLEMENTDAY` aka chronological order.
@@ -184,13 +192,13 @@ Thus, it is highly recommended to specify an unique custom name for each run to 
 
 ### Clone and Build
 
-You can clone the source code with the following command to start debugging / testing ([git-scm for Windows](https://git-scm.com/) is required):
+You can clone the source code with the following command to start debugging/testing ([git-scm](https://git-scm.com/) is required on Windows devices):
 
     git clone https://github.com/larryh12/gu-capstone-2022-caeepr.git
 
 #### Install required packages
 
-The source code provides the `1_init.bat` script to install the required Python packages, in order to build and run the app. Latest version of [Python](https://www.python.org/downloads/) and [pip](https://pypi.org/project/pip/) is highly recommended.
+The source code provides the `1_init.bat` script to install the required Python packages on Windows devices. Latest version of [Python](https://www.python.org/downloads/) and [pip](https://pypi.org/project/pip/) is highly recommended.
 
 Just double-click to run the script. If there are issues, try right-click and `Run as administrator`.
 
@@ -198,7 +206,7 @@ Here are the list of the packages used for this project:
 
 - [pandas](https://pandas.pydata.org/) and [NumPy](https://numpy.org/) for data processing.
 - [PySimpleGUI](https://www.pysimplegui.org/) for the GUI.
-- [openpyxl](https://openpyxl.readthedocs.io/) for exporting dataframe to Excel output.
+- [openpyxl](https://openpyxl.readthedocs.io/) for exporting to Excel output.
 - [PyInstaller](https://pyinstaller.org/) for building the source code into a Windows executable.
 
 #### Build into executable
@@ -209,26 +217,30 @@ The script use `PyInstaller` package to build from the source code, so make sure
 
 Also, make sure to have the batch scripts in the same directory as both `App.py` and `GUI.py`.
 
-#### Notes about cloning and building
+#### Notes on building source
 
-The original purposes of these scripts were to aid development process and provide my teammates the option to quickly setup the dev environment on their machines to start debugging and testing.
+The original purposes of these scripts were to aid development process and provide my teammates the option to quickly setup the dev environment on their devices to start debugging and testing.
 
-Although it had been tested to work on my teammates' and client's machines, it is not guaranteed to work as expected on your local machine / environment, as there will be some differences in each machine Python setup, system PATH scope, permissions, etc.
+Although it had been tested by my teammates and clients, it is not guaranteed to work as expected on your local device/environment, as there will be some differences in each machine Python setup, system PATH, scope, permissions, etc.
 
-Again, building the source code is not a common practice for most users unless you are interested in debugging and/or testing. If you run into issues, I would highly recommend trying our pre-built executable releases from the source below.
+Again, building the source code is not a common practice for most users unless you are interested in debugging and/or testing. If you run into issues, I would highly recommend trying our pre-built executable releases below.
 
-### Changelog and Releases
+## Changelog and Releases
 
 To get the pre-built `EXE`, see our [Releases](https://github.com/merrecdarkin/Wil-Project-AEMO-CSV-Efficient-Reading-Sorting-and-Export-/releases)
 
 To get more into the technical implementation, see our [Pull requests](https://github.com/merrecdarkin/Wil-Project-AEMO-CSV-Efficient-Reading-Sorting-and-Export-/pulls?q=is%3Apr+is%3Aclosed) and [Issues](https://github.com/merrecdarkin/Wil-Project-AEMO-CSV-Efficient-Reading-Sorting-and-Export-/issues?q=is%3Aissue+is%3Aclosed)
 
+<br/>
+
+---
+
 <details>
 <summary>Team Members</summary>
 
-- [Hung Nguyen Khac](https://www.linkedin.com/in/hung-nguyen-khac-066a52222/)
-- [Salman Iqbal](https://www.linkedin.com/in/salman-iqbal-56047a155/)
-- [Jayden Kino](https://www.linkedin.com/in/jayden-kino/)
-- [Thomas Doohan](https://www.linkedin.com/in/thomasdoohan/)
-- and ya boi of course 😎
+- [Larry Huynh](https://www.linkedin.com/in/larry-huynh-dev/) - Developer
+- [Hung Nguyen Khac](https://www.linkedin.com/in/hung-nguyen-khac-066a52222/) - Developer
+- [Salman Iqbal](https://www.linkedin.com/in/salman-iqbal-56047a155/) - Tester
+- [Jayden Kino](https://www.linkedin.com/in/jayden-kino/) - Project Manager
+- [Thomas Doohan](https://www.linkedin.com/in/thomasdoohan/) - Client Liaison
 </details>
