@@ -144,20 +144,28 @@ Thus, it is highly recommended to specify an unique custom name for each run to 
 ### Error Handling and Troubleshooting
 
 - Any actions when no root folder is specified.
+
   ![err-1.png](docs/err-1.png)
 - Wrong date format.
+
   ![err-2.png](docs/err-2.png)
 - Try export with no CSV.
+
   ![err-3.png](docs/err-3.png)
 - Check for empty output.
+
   ![err-4.png](docs/err-4.png)
 - Q: What happens if I leave DUID input empty?
+
   A: The app exports **all** `DUID` data, but after duplication purging of course. This is also a good method to only trim/debloat the raw table without the need to inspect specific `DUID(s)`.
 - Q: What happens if I leave BIDTYPE input empty?
+
   A: Same with `DUID`. Again, selecting a single `DUID` while leaving `BIDTYPE` empty will export **all** bid types for that specific device ID.
 - Q: I tried exporting all DUID, but the output was not sorted chronologically as you mentioned?
+
   A: The client required the output to be grouped by `DUID`. So, for export of multiple device IDs with a period more than 1-day, the output will **first** be grouped into sections by `DUID`, **then** in each `DUID` block, the rows are **sorted** by `SETTLEMENTDAY` aka chronological order.
 - Q: I tried putting the character "/" in the output file name but it got omitted?
+
   A: For now, the app will trim out "troublesome" character(s) in the output section, the character "/" which has the side-effect of creating new child folder instead of exporting the file, is one example. So, it is recommended to name your file with alphanumeric characters only to avoid unintended behaviours.
 
 ## Extras
