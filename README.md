@@ -4,13 +4,6 @@
 
 ---
 
-## About AEMO Data App
-
-- An undergraduate [work-integrated](https://www.griffith.edu.au/enrich-your-studies/work-integrated-learning) capstone project for my Bachelor's degree.
-- The project delivers a Windows application that provides an **interactive GUI**, **data processing** and **data extraction** features for the Australian Energy Market Operator raw dataset.
-- The project utilises [pandas](https://pandas.pydata.org/) - an open-source data analysis library, and other supplementary [Python](https://www.python.org/) frameworks.
-- The project received [Finalist Place](https://drive.google.com/file/d/1KgHNuUkKHJ_I-4aHQvx8IObYiW26RZeG) for The Best Innovative Project in Trimester 2, 2022 in the [FirstWave Awards](https://www.griffith.edu.au/griffith-sciences/school-information-communication-technology/industry/firstwave-awards).
-
 ## Project Overview
 
 ### Project Requirements
@@ -47,7 +40,7 @@ _There is also the prospect of post-graduate level projects particularly address
 
 ### Import Data and Filter
 
-The app can import multiple .csv files that match the AEMO name pattern `PUBLIC_BIDMOVE_COMPLETE_YYYYMMDD` from a parent folder. The app also scans for all children folder recursively to find all valid files.
+The app can import `.csv` files that match the AEMO name pattern `PUBLIC_BIDMOVE_COMPLETE_YYYYMMDD` from a root folder. The app also recursively scans for all subfolders to find valid files.
 
 ![Example folder structure](docs/tree.png)
 
@@ -57,7 +50,7 @@ Example folder structure
 
 Import result:  `DUMMY.CSV` and `RANDOM.txt` are not imported.
 
-The user can proceed to narrow down the range of data using the initial date filter. The user can enter the date input manually or use the built-in calendar.
+The user can proceed to narrow down the range of data using the date filter. The user can enter the date input manually or use the built-in calendar.
 
 ![Date filter operation](docs/import-2.png)
 
@@ -69,11 +62,11 @@ Filter result
 
 ### Multiple Query Filter
 
-For client requirements, the user can use a combination of multiple `Device Unit Identifiers (DUID)` and `BIDTYPE`.
+The user can use a combination of multiple `Device Unit Identifiers (DUID)` and `BIDTYPE`.
 
 ![filter-1.png](docs/filter-1.png)
 
-After clicking `EXPORT`, the user is prompted with a confirmation dialog and a brief overview of the expected data. This is to give the user a quick glance over the output and to double-check for any mistakes from the input, before proceeding to the actual export process.
+After selecting `EXPORT`, the user is prompted with a confirmation dialog and overview of the output data. This provides a quick preview to ensure that the data is as expected and ready for export.
 
 ![filter-2.png](docs/filter-2.png)
 
@@ -81,17 +74,17 @@ After clicking `EXPORT`, the user is prompted with a confirmation dialog and a 
 
 #### Data Stacking Problem
 
-A single CSV file records 24-hour of bidding data. However, in each file, there are **two different tables** stacking on each other, that represent **two different data types**, which are the `bidding price` and the `MWh quantity` that form `"the coupled band-based price/quantity data"` *(see project overview for more details)*.
+A single CSV file records 24-hour of bidding data. However, in each file, there are **two different tables** stacking on one another, that represent **two different data types**, which are the _bidding price_ and the _MWh quantity_ together forming _"the coupled band-based price/quantity data"_.
 
-AEMO refers the two tables as `BIDDAYOFFER_D` and `BIDPEROFFER_D`. See the report definitions:
+AEMO refers the two tables as `BIDDAYOFFER_D` and `BIDPEROFFER_D`.
 
 ![stack-1.png](docs/stack-1.png)
 
-The cut-off point of the two tables is also different for each CSV file since the recorded data varied significantly everyday. For example, on `2022/01/02`, the cut-off occurred at row `1292`.
+The cut-off point of the two tables is different for each CSV file since the recorded data varied significantly everyday. For example, on `2022/01/02`, the cut-off occurred at row `1292`.
 
 ![stack-4.png](docs/stack-4.png)
 
-The app attempts to dynamically identify and separate the two different data tables. In the case of multiple CSV input, *i.e., 1-week range (7 files)*, the process is each applied **chronologically** to individual file *(1-day data)*, before compiling all the **post-processed** data into a final output.
+The app attempts to dynamically identify and separate the two different data tables. In the case of multiple CSV files, *i.e., in 1-week range (7 files)*, the process is applied **chronologically** to individual file *(1-day data)*, before compiling all the **post-processed** data into final output.
 
 ![Example output](docs/stack-2.png)
 
@@ -103,19 +96,19 @@ Notice how the `Price` sheet displays `PRICEBAND` for bidding price data, wh
 
 #### Data Duplication Problem
 
-The AEMO records and updates data in a 5-minute interval regardless of changes occurred. Every 5 minutes, if there is no data change, there will be **at least** one entry added per **one** `DUID` and **one** `BIDTYPE`.
+The AEMO records and updates data in a 5-minute interval regardless of changes occurred. Every 5 minutes, there will be **at least** one entry added per **one** `DUID` and **one** `BIDTYPE`.
 
 ![dup-2.png](docs/dup-2.png)
 
-However, since there are well over 1000 unique `DUIDs` being monitored daily, this results in a raw CSV with over **300,000** entries **per day**, each file takes around **70MB** of disk storage.
+However, since there are well over 1000 unique `DUIDs` being monitored daily, this results in the raw CSV containing over **300,000** entries **per day**, each file takes around **70MB** of disk storage.
 
 ![dup-1.png](docs/dup-1.png)
 
-Although equipped with a large amount of data, most of the raw CSV provide little to no useful information, since it is very difficult to detect actual data fluctuation and draw meaningful insight, as the frequency of data change is rather small *(not to mention there are repeated entries for `BIDTYPE` as well)*.
+Although equipped with a large amount of data, most of the raw CSV provide little to no useful information, since it is difficult to detect actual data fluctuation and draw meaningful insight, as the frequency of data change is rather small *(not to mention there are repeated entries for `BIDTYPE`)*.
 
-It is estimated that only around **1%** of the data entries present useful information to the client while the rest **99%** are bloated duplication.
+It is estimated that only around **1%** of the data entries present useful information to CAEEPR while the rest **99%** are duplication.
 
-The app aims to solve this problem by detecting and filtering out non-changing entries, by checking a combination of different attributes such as `LASTCHANGED`, `BANDAVAIL`, `PRICEBAND`, etc.
+The app aims to solve this problem by detecting and filtering non-changing entries, by checking a combination of different attributes such as `LASTCHANGED`, `BANDAVAIL`, `PRICEBAND`, etc.
 
 An example query of 2 `DUID` and 3 `BIDTYPE` in a range of 3 days *(over **1 million** rows of raw data)* returns a **12KB** Excel file *(size reduced nearly by **18000 times** from 3 raw CSVs)* with a total of **69** rows for both price and quantity data *(about **96%** debloated)*.
 
@@ -123,9 +116,9 @@ An example query of 2 `DUID` and 3 `BIDTYPE` in a range of 3 days *(over *
 
 ### Output and Export
 
-For client requirements, the app exports to Excel `.xlsx` file format.
+The app exports the final output to Excel `.xlsx` file format.
 
-The app provides *optional* features to specify a custom output file name **and/or** a custom save folder location. If both options are left empty, by default, an `output.xlsx` will be generated at the same folder that the app is run from.
+The app provides *optional* features to specify a custom output name **and/or** a custom save location. If both options are left empty, by default, an `output.xlsx` file will be generated in the same folder that the app is executed from.
 
 ![Export config](docs/export-1.png)
 
@@ -137,13 +130,13 @@ Output result
 
 Please be aware that in most cases, the app will attempt to **overwrite** any existing `.xlsx` files that have the **same** file name.
 
-For example, if you leave custom name empty, any subsequent run of the app will export to a single `output.xlsx` file, and the data from previous runs will be **overwritten** by the new output data.
+For example, if you leave custom name empty, any subsequent run of the app will export to the `output.xlsx` file, and the data from previous runs will be **overwritten** by data from the new run.
 
 Thus, it is highly recommended to specify an unique custom name for each run to avoid data loss.
 
-### Error Handling and Troubleshooting
+### Error Handling and FAQs
 
-- Any actions when no root folder is specified.
+- No root folder specified.
 
   ![err-1.png](docs/err-1.png)
 - Wrong date format.
@@ -157,61 +150,56 @@ Thus, it is highly recommended to specify an unique custom name for each run to 
   ![err-4.png](docs/err-4.png)
 - Q: What happens if I leave DUID input empty?
 
-  A: The app exports **all** `DUID` data, but after duplication purging of course. This is also a good method to only trim/debloat the raw table without the need to inspect specific `DUID(s)`.
+  A: The app exports **all** DUID data, with duplication removal, DUID grouping, and chronological sort. This is a good method to only trim/debloat the raw data.
 - Q: What happens if I leave BIDTYPE input empty?
 
-  A: Same with `DUID`. Again, selecting a single `DUID` while leaving `BIDTYPE` empty will export **all** bid types for that specific device ID.
-- Q: I tried exporting all DUID, but the output was not sorted chronologically as you mentioned?
+  A: Selecting a DUID while leaving BIDTYPE empty will export **all** bid types for that DUID, with duplication removal, BIDTYPE grouping, and chronological sort.
+- Q: I tried exporting all DUID, but the output was not sorted chronologically?
 
-  A: The client required the output to be grouped by `DUID`. So, for export of multiple device IDs with a period more than 1-day, the output will **first** be grouped into sections by `DUID`, **then** in each `DUID` block, the rows are **sorted** by `SETTLEMENTDAY` aka chronological order.
-- Q: I tried putting the character "/" in the output file name but it got omitted?
+  A: For export of multiple DUIDs with period more than 1-day, the output will **first** be grouped into sections by DUID, **then** in each DUID block, the rows are **sorted** chronologically by SETTLEMENTDAY.
+- Q: I tried putting the character `/` in the output file name?
 
-  A: For now, the app will trim out "troublesome" character(s) in the output section, the character "/" which has the side-effect of creating new child folder instead of exporting the file, is one example. So, it is recommended to name your file with alphanumeric characters only to avoid unintended behaviours.
+  A: The app trims "troublesome" characters in the output name. The character `/` which has the side-effect of creating a new subfolder, is one example. Therefore, it is recommended to name output file with alphanumeric characters only to avoid unexpected behaviours.
 
-## Extras
 
-### Clone and Build
+## Clone and Build
 
-You can clone the source code with the following command to start debugging/testing ([git-scm](https://git-scm.com/) is required on Windows devices)
+First clone the source code with the following command ([git-scm](https://git-scm.com/) is required on Windows)
 
 ```
 git clone https://github.com/larryh12/aemo-app.git
 ```
 
-#### Install required packages
+### Install Required Packages
 
-The source code provides the `1_init.bat` script to install the required Python packages on Windows devices. Latest version of [Python](https://www.python.org/downloads/) and [pip](https://pypi.org/project/pip/) is highly recommended.
+The source code provides a `1_init.bat` script to install the required Python packages. Latest version of [Python](https://www.python.org/downloads/) and [pip](https://pypi.org/project/pip/) is recommended.
 
-Just double-click to run the script. If there are issues, try right-click and `Run as administrator`.
+Double-click to run the script. If there are issues, try right-click and `Run as administrator`.
 
-Here are the list of the packages used for this project:
+Packages used in this project:
 
 - [pandas](https://pandas.pydata.org/) and [NumPy](https://numpy.org/) for data processing.
 - [PySimpleGUI](https://www.pysimplegui.org/) for the GUI.
 - [openpyxl](https://openpyxl.readthedocs.io/) for exporting to Excel output.
 - [PyInstaller](https://pyinstaller.org/) for building the source code into a Windows executable.
 
-#### Build into executable
+### Build into Executable
 
-The source code provides the `2_build.bat` script to build the source into a Windows `EXE` file.
+The source code provides a `2_build.bat` script to build the source into a Windows `EXE` file.
 
-The script use `PyInstaller` package to build from the source code, so make sure to have it already installed, either manually or running the `1_init.bat` script first.
+The script use `PyInstaller` package to build from source, so make sure to have it already installed, either manually or by running the `1_init.bat` script.
 
-Also, make sure to have the batch scripts in the same directory as both `App.py` and `GUI.py`.
+### Disclaimer
 
-#### Notes on building source
+The original use of these scripts were to speed up development and provide my teammates the option to quickly setup their dev environment.
 
-The original purposes of these scripts were to aid development process and provide my teammates the option to quickly setup the dev environment on their devices to start debugging and testing.
+It is not guaranteed to work as expected on other devices, as there could be differences in Python setup, system PATH, local scope and permissions, etc.
 
-Although it had been tested by my teammates and clients, it is not guaranteed to work as expected on your local device/environment, as there will be some differences in each machine Python setup, system PATH, scope, permissions, etc.
-
-Again, building the source code is not a common practice for most users unless you are interested in debugging and/or testing. If you run into issues, I would highly recommend trying our pre-built executable releases below.
+Building the source code is not recommended for most common usages. If you run into issues, I would highly recommend trying the executable releases.
 
 ## Changelog and Releases
 
-To get the pre-built `EXE`, see our [Releases](https://github.com/merrecdarkin/Wil-Project-AEMO-CSV-Efficient-Reading-Sorting-and-Export-/releases).
-
-To get more into the technical implementation, see our [Pull requests](https://github.com/merrecdarkin/Wil-Project-AEMO-CSV-Efficient-Reading-Sorting-and-Export-/pulls?q=is%3Apr+is%3Aclosed) and [Issues](https://github.com/merrecdarkin/Wil-Project-AEMO-CSV-Efficient-Reading-Sorting-and-Export-/issues?q=is%3Aissue+is%3Aclosed).
+To get the compiled `EXE`, please visit [Releases](https://github.com/merrecdarkin/Wil-Project-AEMO-CSV-Efficient-Reading-Sorting-and-Export-/releases).
 
 ## Team Members
 
